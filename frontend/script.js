@@ -45,7 +45,7 @@ async function loadStats() {
   }
 }
 
-// Function to load classification confidence chart
+// Function to load Classification Confidence Distribution
 async function loadClassificationConfidenceChart() {
   const chartContainer = document.getElementById("classification-confidence-chart");
 
@@ -53,8 +53,11 @@ async function loadClassificationConfidenceChart() {
     const response = await fetch(`${API_BASE_URL}/classification_confidence`);
     const data = await response.json();
 
-    const labels = data.map((item) => `${item.confidence_percentage}%`);
-    const counts = data.map((item) => item.document_count);
+    // Group the data into buckets of 5% confidence
+    const groupedData = groupDataByConfidence(data);
+
+    const labels = Object.keys(groupedData); // Buckets (e.g., "0-5%", "5-10%", etc.)
+    const counts = Object.values(groupedData); // Document counts for each bucket
 
     const ctx = chartContainer.getContext("2d");
     new Chart(ctx, {
@@ -80,6 +83,29 @@ async function loadClassificationConfidenceChart() {
   } catch (error) {
     console.error("Error fetching classification confidence data:", error);
   }
+}
+
+// Function to group data into 5% buckets
+function groupDataByConfidence(data) {
+  const grouped = {};
+
+  data.forEach((item) => {
+    const confidence = item.confidence_percentage;
+    const bucket = Math.floor(confidence / 5) * 5; // Group into 5% ranges (0-5%, 5-10%, etc.)
+
+    // Create the bucket label (e.g., "0-5%", "5-10%")
+    const bucketLabel = `${bucket}-${bucket + 5}%`;
+
+    // Initialize the bucket if it doesn't exist
+    if (!grouped[bucketLabel]) {
+      grouped[bucketLabel] = 0;
+    }
+
+    // Add the document count to the appropriate bucket
+    grouped[bucketLabel] += item.document_count;
+  });
+
+  return grouped;
 }
 
 // Top Classifiers by Confidence
