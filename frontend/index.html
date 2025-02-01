@@ -65,20 +65,20 @@
         <div class="card-body">
           <!-- Filter Inputs -->
           <div class="mb-3">
-            <label for="document-id-filter" class="form-label">Document ID</label>
-            <input type="text" id="document-id-filter" class="form-control" placeholder="Enter Document ID to filter">
-          </div>
-          <div class="mb-3">
             <label for="filename-filter" class="form-label">Filename</label>
             <input type="text" id="filename-filter" class="form-control" placeholder="Enter Filename to filter">
+          </div>
+          <div class="mb-3">
+            <label for="document-id-filter" class="form-label">Document ID</label>
+            <input type="text" id="document-id-filter" class="form-control" placeholder="Enter Document ID to filter">
           </div>
           <button class="btn btn-primary" onclick="loadDocumentStats()">Apply Filters</button>
           <div class="table-container">
             <table class="table mt-4" id="document-stats-table">
               <thead>
                 <tr>
-                  <th>Document ID</th>
                   <th>Filename</th>
+                  <th>DOcument ID</th>
                   <th>Avg Field Accuracy</th>
                   <th>Avg OCR Accuracy</th>
                 </tr>
@@ -87,6 +87,32 @@
                 <!-- Data will load here dynamically -->
               </tbody>
             </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal for Field Data -->
+      <div class="modal fade" id="fieldDataModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Field Data for <span id="modal-filename"></span></h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Field Name</th>
+                    <th>Field Value</th>
+                    <th>Field Accuracy</th>
+                  </tr>
+                </thead>
+                <tbody id="field-data-table-body">
+                  <!-- Field data will load here dynamically -->
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>

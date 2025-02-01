@@ -381,19 +381,20 @@ async function loadTableData() {
 // Fetch the document stats from the backend
 async function loadDocumentStats() {
   const tableBody = document.querySelector('#document-stats-table tbody');
-  const documentIdFilter = document.querySelector('#document-id-filter').value;
   const filenameFilter = document.querySelector('#filename-filter').value;
+  const documentIdFilter = document.querySelector('#document-id-filter').value;
 
   try {
     // Construct query parameters based on filter inputs
     let url = `${API_BASE_URL}/document_stats`;
     const params = new URLSearchParams();
 
-    if (documentIdFilter) {
-      params.append('document_id', documentIdFilter);
-    }
     if (filenameFilter) {
       params.append('filename', filenameFilter);
+    }
+
+    if (documentIdFilter) {
+      params.append('document_id', documentIdFilter);
     }
 
     if (params.toString()) {
@@ -408,8 +409,12 @@ async function loadDocumentStats() {
     data.forEach(stat => {
       const row = document.createElement('tr');
       row.innerHTML = `
+        <td>
+          <a href="#" onclick="showFieldData('${stat.document_id}', '${stat.filename}')">
+            ${stat.filename}
+          </a>
+        </td>
         <td>${stat.document_id}</td>
-        <td>${stat.filename}</td>
         <td>${(stat.avg_field_accuracy * 100).toFixed(2)}%</td>
         <td>${(stat.avg_ocr_accuracy * 100).toFixed(2)}%</td>
       `;
@@ -417,6 +422,36 @@ async function loadDocumentStats() {
     });
   } catch (error) {
     console.error('Error loading document stats:', error);
+  }
+}
+
+// Fetch and display field data in a modal
+async function showFieldData(documentId, filename) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/field_data?document_id=${documentId}`);
+    const fieldData = await response.json();
+
+    const modalFilename = document.getElementById("modal-filename");
+    modalFilename.textContent = filename;
+
+    const fieldDataTableBody = document.getElementById("field-data-table-body");
+    fieldDataTableBody.innerHTML = "";
+
+    fieldData.forEach(field => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${field.field_name}</td>
+        <td>${field.field_value}</td>
+        <td>${field.field_accuracy ? (field.field_accuracy * 100).toFixed(2) + '%' : 'N/A'}</td>
+      `;
+      fieldDataTableBody.appendChild(row);
+    });
+
+    // Show the modal
+    const fieldDataModal = new bootstrap.Modal(document.getElementById("fieldDataModal"));
+    fieldDataModal.show();
+  } catch (error) {
+    console.error('Error fetching field data:', error);
   }
 }
 
