@@ -48,7 +48,7 @@ async function loadStats() {
 // Fetch field stats data
 async function loadFieldStats() {
   const ctx = document.getElementById('fieldStatsChart').getContext('2d');
-  
+
   try {
     const response = await fetch(`${API_BASE_URL}/extractions/field-stats/`);
     const data = await response.json();
@@ -56,7 +56,6 @@ async function loadFieldStats() {
     // Prepare the data for the chart
     const labels = data.map(item => item.field);
     const avgAccuracy = data.map(item => item.avg_field_accuracy);
-    const avgConfidence = data.map(item => item.avg_confidence);
     const avgOcrConfidence = data.map(item => item.avg_document_ocr_confidence);
 
     // Create the chart
@@ -70,13 +69,6 @@ async function loadFieldStats() {
             data: avgAccuracy,
             backgroundColor: 'rgba(75, 192, 192, 0.2)',
             borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 1
-          },
-          {
-            label: 'Average Confidence',
-            data: avgConfidence,
-            backgroundColor: 'rgba(153, 102, 255, 0.2)',
-            borderColor: 'rgba(153, 102, 255, 1)',
             borderWidth: 1
           },
           {

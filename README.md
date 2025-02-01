@@ -12,7 +12,6 @@ This project provides a web-based dashboard to display document extraction stats
 ## Project Structure
 
 ```sh
-/Extractly
 .
 ├── README.md
 ├── backend
@@ -27,6 +26,11 @@ This project provides a web-based dashboard to display document extraction stats
     ├── script.js
     └── style.css
 ```
+
+## Dashboard
+
+![](images/dashboard.png)
+![](images/field_stats.png)
 
 ## Setup and Installation
 

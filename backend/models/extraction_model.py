@@ -1,4 +1,12 @@
-from sqlalchemy import Column, Integer, String, Boolean, Float, DateTime, PrimaryKeyConstraint
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    Boolean,
+    Float,
+    DateTime,
+    PrimaryKeyConstraint,
+)
 from sqlalchemy.sql import func
 from database import Base
 from pydantic import BaseModel
@@ -26,7 +34,9 @@ class Extraction(Base):
 
     # Composite Primary Key
     __table_args__ = (
-        PrimaryKeyConstraint("filename", "field_id", "field", "row_index", "column_index"),
+        PrimaryKeyConstraint(
+            "filename", "field_id", "field", "row_index", "column_index"
+        ),
     )
 
 
@@ -35,8 +45,8 @@ class FieldStats(BaseModel):
     field_id: str
     field: str
     avg_field_accuracy: float
-    avg_confidence: float
     avg_document_ocr_confidence: float
+
 
 class DocumentStats(BaseModel):
     document_id: str
