@@ -114,21 +114,22 @@
           </div>
 
           <!-- Table for Model Output Accuracy by Document -->
-          <table class="table" id="stp-accuracy-table">
-            <thead>
-              <tr>
-                <th>Filename</th>
-                <th>Document ID</th>
-                <th>Total Fields</th>
-                <th>Correct Fields</th>
-                <th>Accuracy (%)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Data will load here dynamically -->
-            </tbody>
-          </table>
-
+          <div class="table-container">
+            <table class="table" id="stp-accuracy-table">
+              <thead>
+                <tr>
+                  <th>Filename</th>
+                  <th>Document ID</th>
+                  <th>Total Fields</th>
+                  <th>Correct Fields</th>
+                  <th>Accuracy (%)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Data will load here dynamically -->
+              </tbody>
+            </table>
+          </div>
           <!-- Modal for Document Details -->
           <div class="modal fade" id="document-details-modal" tabindex="-1" aria-labelledby="documentDetailsModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">

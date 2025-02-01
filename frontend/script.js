@@ -163,7 +163,7 @@ async function loadClassificationAccuracyChart() {
       const datasets = createDatasets(data);
 
       // Extract document_type_ids as labels (X-axis)
-      const labels = data.map(item => item.document_type_id);
+      const labels = data.map((item) => item.document_type_id);
 
       // Create and render the chart
       renderChart(labels, datasets);
@@ -177,14 +177,15 @@ async function loadClassificationAccuracyChart() {
 
 // Creating datasets for the chart with unique colors
 function createDatasets(data) {
-  return [{
-    label: 'Accuracy',
-    data: data.map(item => item.accuracy),
-    backgroundColor: generateRandomColors(data.length),
-    borderColor: 'black',  // Optional: Border color for the bars
-    borderWidth: 1,
-    fill: true,  // Optional: Adds a fill under the bars
-  }];
+  return [
+    {
+      label: "Accuracy",
+      data: data.map((item) => item.accuracy),
+      backgroundColor: generateRandomColors(data.length), // Use random colors for each bar
+      borderColor: "black", // Optional: Border color for the bars
+      borderWidth: 1,
+    },
+  ];
 }
 
 // Function to generate an array of random colors for each bar
@@ -199,9 +200,11 @@ function generateRandomColors(numColors) {
 
 // Rendering the chart
 function renderChart(labels, datasets) {
-  const ctx = document.getElementById('classification-accuracy-chart').getContext('2d');
+  const ctx = document
+    .getElementById("classification-accuracy-chart")
+    .getContext("2d");
   new Chart(ctx, {
-    type: 'bar', // Bar chart for better clarity with document types
+    type: "bar", // Bar chart for better clarity with document types
     data: {
       labels: labels,
       datasets: datasets,
@@ -210,48 +213,14 @@ function renderChart(labels, datasets) {
       responsive: true,
       scales: {
         x: {
-          title: { display: true, text: 'Document Type' }
+          title: { display: true, text: "Document Type" },
         },
         y: {
-          title: { display: true, text: 'Accuracy (%)' },
+          title: { display: true, text: "Accuracy (%)" },
           beginAtZero: true, // Start Y-axis at 0 for better visibility of low accuracies
-        }
-      }
-    }
-  });
-}
-
-// Creating datasets for the chart from the data (updated for document_type_id and accuracy)
-function createDatasets(data) {
-  return [{
-    label: 'Accuracy',
-    data: data.map(item => item.accuracy),
-    borderColor: 'hsl(200, 70%, 50%)', // Example color, can be randomized
-    fill: false,
-  }];
-}
-
-// Rendering the chart
-function renderChart(labels, datasets) {
-  const ctx = document.getElementById('classification-accuracy-chart').getContext('2d');
-  new Chart(ctx, {
-    type: 'bar', // Use bar chart for better clarity with document types
-    data: {
-      labels: labels,
-      datasets: datasets,
+        },
+      },
     },
-    options: {
-      responsive: true,
-      scales: {
-        x: {
-          title: { display: true, text: 'Document Type' }
-        },
-        y: {
-          title: { display: true, text: 'Accuracy (%)' },
-          beginAtZero: true, // Start Y-axis at 0 for better visibility of low accuracies
-        }
-      }
-    }
   });
 }
 

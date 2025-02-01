@@ -45,3 +45,18 @@ body {
   #document-stats-table tbody tr {
     height: 50px; /* Adjust row height if needed */
   }
+
+  #stp-accuracy-table tbody {
+    display: block;
+    max-height: 300px; /* Controls the visible area for the table rows */
+    overflow-y: scroll; /* Allows scrolling when content overflows */
+  }
+
+  #stp-accuracy-table thead, #stp-accuracy-table tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  #stp-accuracy-table tbody tr {
+    height: 50px; /* Adjust row height if needed */
