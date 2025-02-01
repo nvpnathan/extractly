@@ -45,14 +45,16 @@ Follow these steps to set up the project locally.
 
     ```sh
     git clone https://github.com/nvpnathan/extractly.git
-    cd extractly
+    cd extractly/backend
     ```
 
 2.	Install Python dependencies:
 
     ```sh
-    pip3 install uv
-    uv install
+    brew install uv
+    uv venv
+    source .venv/bin/activate
+    uv sync
     ```
 
 3.	Point to your sqlite document database
@@ -60,15 +62,14 @@ Follow these steps to set up the project locally.
 4.	Run the backend API:
 
     ```sh
-    uvicorn backend.app:app --reload
+    uvicorn main:app --reload
     ```
 
 ### Running the Dashboard
 
-Once both the backend and frontend are set up:
+Once the backend is running:
 
-1.	Start the backend API server (`uvicorn backend.app:app --reload`).
-2.	Open the `index.html` file in your browser to view the dashboard.
+1.	Open the `index.html` file in your browser to view the dashboard.
 
 The dashboard should now be accessible and will automatically load document stats from the backend.
 
@@ -181,3 +182,11 @@ Each endpoint supports standard HTTP response codes:
 - `400`: Bad request (invalid parameters)
 - `404`: Resource not found
 - `500`: Server error
+
+
+## TODO
+
+- Group Classification Confidence Distribution into % buckets
+- Limit Document Accuracy to limit of 20 with scroll
+- Field Extraction data should be linked to Document Accuracy by filename
+- Add conditional to prevent negative confidence scores to Field Extraction
