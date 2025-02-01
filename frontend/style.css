@@ -9,3 +9,13 @@ body {
   .card {
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   }
+
+  .chart-container {
+    max-width: 300px; /* Set the maximum width of the chart */
+    margin: 0 auto; /* Center the chart */
+  }
+
+  #stp-pie-chart {
+    width: 100%; /* Make the canvas take the full width of the container */
+    height: auto; /* Maintain aspect ratio */
+  }

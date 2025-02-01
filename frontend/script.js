@@ -130,47 +130,88 @@ async function loadTableData() {
 }
 
 // STP Dashboard
-async function loadSTPDashboard() {
-  try {
-    const response = await fetch(`${API_BASE_URL}/stp_dashboard`);
-    const data = await response.json();
+  async function loadSTPDashboard() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/stp_dashboard`);
+      const data = await response.json();
 
-    // Update Overall STP Rate
-    document.getElementById("overall-stp-rate").textContent = data.overall_stp.stp_rate_percentage;
+      // Update Overall STP Rate
+      const overallSTPRate = data.overall_stp.stp_rate_percentage;
+      document.getElementById("overall-stp-rate").textContent = overallSTPRate;
 
-    // Populate Model Output Accuracy Table
-    const accuracyTableBody = document.querySelector("#stp-accuracy-table tbody");
-    accuracyTableBody.innerHTML = data.accuracy_data
-      .map(
-        (row) => `
-      <tr>
-        <td>${row.filename}</td>
-        <td>${row.document_id}</td>
-        <td>${row.total_fields}</td>
-        <td>${row.correct_fields}</td>
-        <td>${row.accuracy_percentage}%</td>
-      </tr>
-    `
-      )
-      .join("");
+      // Render STP Pie Chart
+      renderSTPPieChart(overallSTPRate);
 
-    // Populate STP Rate Table
-    const stpTableBody = document.querySelector("#stp-rate-table tbody");
-    stpTableBody.innerHTML = data.stp_data
-      .map(
-        (row) => `
-      <tr>
-        <td>${row.filename}</td>
-        <td>${row.document_id}</td>
-        <td>${row.stp ? "Yes" : "No"}</td>
-      </tr>
-    `
-      )
-      .join("");
-  } catch (error) {
-    console.error("Error loading STP Dashboard:", error);
+      // Populate Model Output Accuracy Table
+      const accuracyTableBody = document.querySelector("#stp-accuracy-table tbody");
+      accuracyTableBody.innerHTML = data.accuracy_data
+        .map(
+          (row) => `
+        <tr>
+          <td>${row.filename}</td>
+          <td>${row.document_id}</td>
+          <td>${row.total_fields}</td>
+          <td>${row.correct_fields}</td>
+          <td>${row.accuracy_percentage}%</td>
+        </tr>
+      `
+        )
+        .join("");
+
+      // Populate STP Rate Table
+      const stpTableBody = document.querySelector("#stp-rate-table tbody");
+      stpTableBody.innerHTML = data.stp_data
+        .map(
+          (row) => `
+        <tr>
+          <td>${row.filename}</td>
+          <td>${row.document_id}</td>
+          <td>${row.stp ? "Yes" : "No"}</td>
+        </tr>
+      `
+        )
+        .join("");
+    } catch (error) {
+      console.error("Error loading STP Dashboard:", error);
+    }
   }
-}
+
+  function renderSTPPieChart(overallSTPRate) {
+    const ctx = document.getElementById("stp-pie-chart").getContext("2d");
+
+    // Data for the Pie Chart
+    const stpRate = overallSTPRate; // STP rate as a percentage
+    const nonSTP = 100 - stpRate; // Non-STP rate
+
+    new Chart(ctx, {
+      type: "pie",
+      data: {
+        labels: ["STP", "Non-STP"],
+        datasets: [
+          {
+            data: [stpRate, nonSTP],
+            backgroundColor: ["#4caf50", "#f44336"], // Green for STP, Red for Non-STP
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: "top",
+          },
+          tooltip: {
+            callbacks: {
+              label: function (tooltipItem) {
+                return `${tooltipItem.label}: ${tooltipItem.raw}%`;
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
 
 // Fetch the document stats from the backend
 async function loadDocumentStats() {
