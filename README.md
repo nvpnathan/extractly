@@ -37,7 +37,7 @@ This project provides a web-based dashboard to display document extraction stats
 Follow these steps to set up the project locally.
 
 ## Prerequisites
-	•	Python =>3.10
+	• Python =>3.10
 
 ## Backend Setup
 

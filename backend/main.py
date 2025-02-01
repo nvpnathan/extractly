@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends, Query
-from sqlalchemy import func, Float, cast, or_, and_
+from sqlalchemy import func, Integer, Float, select, case, cast, or_, and_
 from sqlalchemy.orm import Session
 from database import engine, Base, get_db
 from models.extraction_model import Extraction, DocumentStats, FieldStats
@@ -119,6 +119,103 @@ async def get_field_stats(db: Session = Depends(get_db)):
         )
         for row in stats
     ]
+
+
+# STP Dashboard endpoint to fetch STP data
+@app.get("/stp_dashboard/")
+def get_stp_dashboard(db: Session = Depends(get_db)):
+    # Query: Model Output Accuracy by Document
+    accuracy_query = (
+        db.query(
+            Extraction.filename,
+            Extraction.document_id,
+            func.count(Extraction.field_id).label("total_fields"),
+            func.sum(cast(Extraction.is_correct, Integer)).label("correct_fields"),
+            func.round(
+                func.sum(cast(Extraction.is_correct, Integer))
+                * 100.0
+                / func.count(Extraction.field_id),
+                2,
+            ).label("accuracy_percentage"),
+        )
+        .group_by(Extraction.filename, Extraction.document_id)
+        .all()
+    )
+
+    # Query: STP Rate by Document
+    subquery = (
+        select(
+            Extraction.filename,
+            Extraction.document_id,
+            func.sum(cast(Extraction.is_correct, Integer)).label("correct_count"),
+            func.count(Extraction.field_id).label("total_count"),
+        )
+        .group_by(Extraction.filename, Extraction.document_id)
+        .subquery()
+    )
+
+    stp_query = db.query(
+        subquery.c.filename,
+        subquery.c.document_id,
+        case((subquery.c.correct_count == subquery.c.total_count, 1), else_=0).label(
+            "stp"
+        ),
+    ).all()
+
+    # Query: Overall STP Rate
+    stp_subquery = (
+        select(
+            Extraction.filename,
+            Extraction.document_id,
+            func.sum(cast(Extraction.is_correct, Integer)).label("correct_count"),
+            func.count(Extraction.field_id).label("total_count"),
+        )
+        .group_by(Extraction.filename, Extraction.document_id)
+        .subquery()
+    )
+
+    overall_stp_query = (
+        db.query(
+            func.round(
+                func.sum(
+                    case(
+                        (stp_subquery.c.correct_count == stp_subquery.c.total_count, 1),
+                        else_=0,
+                    )
+                )
+                * 100.0
+                / func.count(),
+                2,
+            ).label("stp_rate_percentage")
+        )
+        .select_from(stp_subquery)
+        .scalar()
+    )
+
+    # Format results
+    accuracy_data = [
+        {
+            "filename": row.filename,
+            "document_id": row.document_id,
+            "total_fields": row.total_fields,
+            "correct_fields": row.correct_fields,
+            "accuracy_percentage": row.accuracy_percentage,
+        }
+        for row in accuracy_query
+    ]
+
+    stp_data = [
+        {"filename": row.filename, "document_id": row.document_id, "stp": bool(row.stp)}
+        for row in stp_query
+    ]
+
+    overall_stp = {"stp_rate_percentage": overall_stp_query}
+
+    return {
+        "accuracy_data": accuracy_data,
+        "stp_data": stp_data,
+        "overall_stp": overall_stp,
+    }
 
 
 # Endpoint to summarize stats

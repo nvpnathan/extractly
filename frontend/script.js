@@ -129,6 +129,49 @@ async function loadTableData() {
   }
 }
 
+// STP Dashboard
+async function loadSTPDashboard() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/stp_dashboard`);
+    const data = await response.json();
+
+    // Update Overall STP Rate
+    document.getElementById("overall-stp-rate").textContent = data.overall_stp.stp_rate_percentage;
+
+    // Populate Model Output Accuracy Table
+    const accuracyTableBody = document.querySelector("#stp-accuracy-table tbody");
+    accuracyTableBody.innerHTML = data.accuracy_data
+      .map(
+        (row) => `
+      <tr>
+        <td>${row.filename}</td>
+        <td>${row.document_id}</td>
+        <td>${row.total_fields}</td>
+        <td>${row.correct_fields}</td>
+        <td>${row.accuracy_percentage}%</td>
+      </tr>
+    `
+      )
+      .join("");
+
+    // Populate STP Rate Table
+    const stpTableBody = document.querySelector("#stp-rate-table tbody");
+    stpTableBody.innerHTML = data.stp_data
+      .map(
+        (row) => `
+      <tr>
+        <td>${row.filename}</td>
+        <td>${row.document_id}</td>
+        <td>${row.stp ? "Yes" : "No"}</td>
+      </tr>
+    `
+      )
+      .join("");
+  } catch (error) {
+    console.error("Error loading STP Dashboard:", error);
+  }
+}
+
 // Fetch the document stats from the backend
 async function loadDocumentStats() {
   const tableBody = document.querySelector('#document-stats-table tbody');
@@ -177,4 +220,5 @@ document.addEventListener("DOMContentLoaded", () => {
   loadFieldStats();
   loadTableData();
   loadDocumentStats();
+  loadSTPDashboard();
 });
