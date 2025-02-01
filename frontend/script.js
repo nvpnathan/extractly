@@ -255,7 +255,7 @@ function renderChart(labels, datasets) {
   });
 }
 
-// Fetch field stats data
+// Load Document Accuracy by Field Stats
 async function loadFieldStats() {
   const ctx = document.getElementById('fieldStatsChart').getContext('2d');
 

@@ -73,19 +73,21 @@
             <input type="text" id="filename-filter" class="form-control" placeholder="Enter Filename to filter">
           </div>
           <button class="btn btn-primary" onclick="loadDocumentStats()">Apply Filters</button>
-          <table class="table mt-4" id="document-stats-table">
-            <thead>
-              <tr>
-                <th>Document ID</th>
-                <th>Filename</th>
-                <th>Avg Field Accuracy</th>
-                <th>Avg OCR Accuracy</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Data will load here dynamically -->
-            </tbody>
-          </table>
+          <div class="table-container">
+            <table class="table mt-4" id="document-stats-table">
+              <thead>
+                <tr>
+                  <th>Document ID</th>
+                  <th>Filename</th>
+                  <th>Avg Field Accuracy</th>
+                  <th>Avg OCR Accuracy</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Data will load here dynamically -->
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
