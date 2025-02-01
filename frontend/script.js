@@ -45,6 +45,190 @@ async function loadStats() {
   }
 }
 
+// Function to load classification confidence chart
+async function loadClassificationConfidenceChart() {
+  const chartContainer = document.getElementById("classification-confidence-chart");
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/classification_confidence`);
+    const data = await response.json();
+
+    const labels = data.map((item) => `${item.confidence_percentage}%`);
+    const counts = data.map((item) => item.document_count);
+
+    const ctx = chartContainer.getContext("2d");
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: "Document Count",
+            data: counts,
+            backgroundColor: "rgba(54, 162, 235, 0.7)",
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: { title: { display: true, text: "Confidence (%)" } },
+          y: { title: { display: true, text: "Document Count" } },
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching classification confidence data:", error);
+  }
+}
+
+// Top Classifiers by Confidence
+async function loadTopClassifiersChart() {
+  const chartContainer = document.getElementById("top-classifiers-chart");
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/top_classifiers`);
+    const data = await response.json();
+
+    const labels = data.map((item) => item.classifier_name);
+    const confidences = data.map((item) => item.average_confidence);
+
+    const ctx = chartContainer.getContext("2d");
+    new Chart(ctx, {
+      type: "pie",
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: "Average Confidence",
+            data: confidences,
+            backgroundColor: [
+              "#FF6384",
+              "#36A2EB",
+              "#FFCE56",
+              "#4BC0C0",
+              "#9966FF",
+            ],
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: "top" },
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching top classifiers data:", error);
+  }
+}
+
+// Classification Accuracy by Document Type (Chart)
+async function loadClassificationAccuracyChart() {
+  try {
+    // Fetch classification accuracy data
+    const response = await fetch(`${API_BASE_URL}/classification_accuracy`);
+    const data = await response.json();
+
+    // Check if data is available
+    if (data && Array.isArray(data)) {
+      // Create datasets for the chart using the fetched data
+      const datasets = createDatasets(data);
+
+      // Extract document_type_ids as labels (X-axis)
+      const labels = data.map(item => item.document_type_id);
+
+      // Create and render the chart
+      renderChart(labels, datasets);
+    } else {
+      console.error("Invalid data format received from API.");
+    }
+  } catch (error) {
+    console.error("Error fetching or rendering classification accuracy chart:", error);
+  }
+}
+
+// Creating datasets for the chart with unique colors
+function createDatasets(data) {
+  return [{
+    label: 'Accuracy',
+    data: data.map(item => item.accuracy),
+    backgroundColor: generateRandomColors(data.length),
+    borderColor: 'black',  // Optional: Border color for the bars
+    borderWidth: 1,
+    fill: true,  // Optional: Adds a fill under the bars
+  }];
+}
+
+// Function to generate an array of random colors for each bar
+function generateRandomColors(numColors) {
+  const colors = [];
+  for (let i = 0; i < numColors; i++) {
+    const randomColor = `hsl(${Math.random() * 360}, 70%, 50%)`; // Random color generator in HSL format
+    colors.push(randomColor);
+  }
+  return colors;
+}
+
+// Rendering the chart
+function renderChart(labels, datasets) {
+  const ctx = document.getElementById('classification-accuracy-chart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar', // Bar chart for better clarity with document types
+    data: {
+      labels: labels,
+      datasets: datasets,
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: {
+          title: { display: true, text: 'Document Type' }
+        },
+        y: {
+          title: { display: true, text: 'Accuracy (%)' },
+          beginAtZero: true, // Start Y-axis at 0 for better visibility of low accuracies
+        }
+      }
+    }
+  });
+}
+
+// Creating datasets for the chart from the data (updated for document_type_id and accuracy)
+function createDatasets(data) {
+  return [{
+    label: 'Accuracy',
+    data: data.map(item => item.accuracy),
+    borderColor: 'hsl(200, 70%, 50%)', // Example color, can be randomized
+    fill: false,
+  }];
+}
+
+// Rendering the chart
+function renderChart(labels, datasets) {
+  const ctx = document.getElementById('classification-accuracy-chart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar', // Use bar chart for better clarity with document types
+    data: {
+      labels: labels,
+      datasets: datasets,
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: {
+          title: { display: true, text: 'Document Type' }
+        },
+        y: {
+          title: { display: true, text: 'Accuracy (%)' },
+          beginAtZero: true, // Start Y-axis at 0 for better visibility of low accuracies
+        }
+      }
+    }
+  });
+}
+
 // Fetch field stats data
 async function loadFieldStats() {
   const ctx = document.getElementById('fieldStatsChart').getContext('2d');
@@ -244,6 +428,9 @@ async function loadDocumentStats() {
 // Initialize the app
 document.addEventListener("DOMContentLoaded", () => {
   loadStats();
+  loadClassificationConfidenceChart();
+  loadTopClassifiersChart();
+  loadClassificationAccuracyChart();
   loadFieldStats();
   loadTableData();
   loadDocumentStats();

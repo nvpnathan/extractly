@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, Query
 from sqlalchemy import func, Integer, Float, select, case, cast, or_, and_
 from sqlalchemy.orm import Session
 from database import get_db
+from models.classification_model import Classification
 from models.extraction_model import Extraction, DocumentStats, FieldStats
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
@@ -30,6 +31,76 @@ def root():
 def get_extractions(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     extractions = db.query(Extraction).offset(skip).limit(limit).all()
     return {"data": extractions}
+
+
+# Classification Confidence Distribution (Bar Chart)
+@app.get("/classification_confidence")
+def get_classification_confidence(db: Session = Depends(get_db)):
+    data = (
+        db.query(
+            Classification.classifier_name,
+            func.round(Classification.classification_confidence * 100, 2).label(
+                "confidence_percentage"
+            ),
+            func.count(Classification.id).label("document_count"),
+        )
+        .group_by(Classification.classifier_name, "confidence_percentage")
+        .all()
+    )
+    return [
+        {
+            "classifier_name": row.classifier_name,
+            "confidence_percentage": row.confidence_percentage,
+            "document_count": row.document_count,
+        }
+        for row in data
+    ]
+
+
+# Top Classifiers by Confidence
+@app.get("/top_classifiers")
+def get_top_classifiers(db: Session = Depends(get_db)):
+    data = (
+        db.query(
+            Classification.classifier_name,
+            func.round(
+                func.avg(Classification.classification_confidence) * 100, 2
+            ).label("average_confidence"),
+        )
+        .group_by(Classification.classifier_name)
+        .order_by(func.avg(Classification.classification_confidence).desc())
+        .limit(5)  # Top 5 classifiers
+        .all()
+    )
+    return [
+        {
+            "classifier_name": row.classifier_name,
+            "average_confidence": row.average_confidence,
+        }
+        for row in data
+    ]
+
+
+# Classification Accuracy by Document Type (Line Chart)
+@app.get("/classification_accuracy/")
+def get_classification_accuracy(db: Session = Depends(get_db)):
+    data = (
+        db.query(
+            Classification.document_type_id,
+            func.round(
+                func.avg(Classification.classification_confidence) * 100, 2
+            ).label("accuracy"),
+        )
+        .group_by(Classification.document_type_id)
+        .all()
+    )
+    return [
+        {
+            "document_type_id": row.document_type_id,
+            "accuracy": row.accuracy,
+        }
+        for row in data
+    ]
 
 
 # Endpoint to fetch records by document_id

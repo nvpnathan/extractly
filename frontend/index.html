@@ -25,11 +25,42 @@
           </div>
         </div>
       </div>
-
-      <!-- Document Stats Chart -->
+      <!--  Classification Confidence Distribution Dashboard -->
       <div class="card mt-4">
         <div class="card-header">
-          <h3 class="card-title">Document Accuracy Dashboard</h3>
+          <h3 class="card-title">Classification Confidence Distribution</h3>
+        </div>
+        <div class="card-body">
+          <canvas id="classification-confidence-chart"></canvas>
+        </div>
+      </div>
+
+      <!--  Top Classifiers by Confidence -->
+      <div class="card mt-4">
+        <div class="card-header">
+          <h3 class="card-title">Top Classifiers by Confidence</h3>
+        </div>
+        <div class="card-body">
+          <div class="chart-container">
+            <canvas id="top-classifiers-chart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Classification Accuracy by Document Type (Line Chart) -->
+      <div class="card mt-4">
+        <div class="card-header">
+          <h3 class="card-title">Classification Accuracy by Document Type</h3>
+        </div>
+        <div class="card-body">
+          <canvas id="classification-accuracy-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- Document Accuracy Dashboard -->
+      <div class="card mt-4">
+        <div class="card-header">
+          <h3 class="card-title">Document Accuracy</h3>
         </div>
         <div class="card-body">
           <!-- Filter Inputs -->
