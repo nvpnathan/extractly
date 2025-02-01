@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Extractly Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/css/tabler.min.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="page">
+    <div class="container-xl">
+      <header class="page-header d-flex justify-content-between align-items-center">
+        <h1 class="page-title">Extractly Dashboard</h1>
+      </header>
+
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Extraction Stats</h3>
+        </div>
+        <div class="card-body">
+          <div id="stats">
+            <!-- Stats will load here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Document Stats Chart -->
+      <div class="card mt-4">
+        <div class="card-header">
+          <h3 class="card-title">Document Accuracy Dashboard</h3>
+        </div>
+        <div class="card-body">
+          <!-- Filter Inputs -->
+          <div class="mb-3">
+            <label for="document-id-filter" class="form-label">Document ID</label>
+            <input type="text" id="document-id-filter" class="form-control" placeholder="Enter Document ID to filter">
+          </div>
+          <div class="mb-3">
+            <label for="filename-filter" class="form-label">Filename</label>
+            <input type="text" id="filename-filter" class="form-control" placeholder="Enter Filename to filter">
+          </div>
+          <button class="btn btn-primary" onclick="loadDocumentStats()">Apply Filters</button>
+          <table class="table mt-4" id="document-stats-table">
+            <thead>
+              <tr>
+                <th>Document ID</th>
+                <th>Filename</th>
+                <th>Avg Field Accuracy</th>
+                <th>Avg OCR Accuracy</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Data will load here dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Field Stats Chart -->
+      <div class="card mt-4">
+        <div class="card-header">
+          <h3 class="card-title">Field Stats</h3>
+        </div>
+        <div class="card-body">
+          <canvas id="fieldStatsChart" width="400" height="200"></canvas>
+        </div>
+      </div>
+
+      <div class="card mt-4">
+        <div class="card-header">
+          <h3 class="card-title">Extraction Data</h3>
+        </div>
+        <div class="card-body">
+          <table class="table" id="data-table">
+            <thead>
+              <tr>
+                <th>Filename</th>
+                <th>Document ID</th>
+                <th>Field</th>
+                <th>Value</th>
+                <th>Validated</th>
+                <th>Confidence</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Rows will load here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
