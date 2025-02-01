@@ -71,7 +71,7 @@
       <!-- Straight Through Processing Dashboard -->
       <div class="card mt-4">
         <div class="card-header">
-          <h3 class="card-title">Straight Through Processing (STP) Dashboard</h3>
+          <h3 class="card-title">Straight Through Processing (STP)</h3>
         </div>
         <div class="card-body">
           <!-- Overall STP Rate -->
@@ -96,24 +96,40 @@
             </tbody>
           </table>
 
-          <!-- Table for STP Rate -->
-          <table class="table mt-4" id="stp-rate-table">
-            <thead>
-              <tr>
-                <th>Filename</th>
-                <th>Document ID</th>
-                <th>STP</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Data will load here dynamically -->
-            </tbody>
-          </table>
+          <!-- Modal for Document Details -->
+          <div class="modal fade" id="document-details-modal" tabindex="-1" aria-labelledby="documentDetailsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="documentDetailsModalLabel">Document Fields</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <table class="table" id="document-fields-table">
+                    <thead>
+                      <tr>
+                        <th>Field</th>
+                        <th>Value</th>
+                        <th>Validated Value</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- Field data will load here dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+      <!-- Field Extraction Data Dashboard -->
       <div class="card mt-4">
         <div class="card-header">
-          <h3 class="card-title">Extraction Data</h3>
+          <h3 class="card-title">Field Extraction Data</h3>
         </div>
         <div class="card-body">
           <table class="table" id="data-table">

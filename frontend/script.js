@@ -157,20 +157,6 @@ async function loadTableData() {
       `
         )
         .join("");
-
-      // Populate STP Rate Table
-      const stpTableBody = document.querySelector("#stp-rate-table tbody");
-      stpTableBody.innerHTML = data.stp_data
-        .map(
-          (row) => `
-        <tr>
-          <td>${row.filename}</td>
-          <td>${row.document_id}</td>
-          <td>${row.stp ? "Yes" : "No"}</td>
-        </tr>
-      `
-        )
-        .join("");
     } catch (error) {
       console.error("Error loading STP Dashboard:", error);
     }

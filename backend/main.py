@@ -1,14 +1,11 @@
 from fastapi import FastAPI, Depends, Query
 from sqlalchemy import func, Integer, Float, select, case, cast, or_, and_
 from sqlalchemy.orm import Session
-from database import engine, Base, get_db
+from database import get_db
 from models.extraction_model import Extraction, DocumentStats, FieldStats
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 
-
-# Create all tables
-Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -25,7 +22,7 @@ app.add_middleware(
 
 @app.get("/")
 def root():
-    return {"message": "Welcome to the Extraction API"}
+    return {"message": "Welcome to the Extractly API"}
 
 
 # Extraction Stats Dashbaord endpoint to fetch all records
@@ -142,26 +139,6 @@ def get_stp_dashboard(db: Session = Depends(get_db)):
         .all()
     )
 
-    # Query: STP Rate by Document
-    subquery = (
-        select(
-            Extraction.filename,
-            Extraction.document_id,
-            func.sum(cast(Extraction.is_correct, Integer)).label("correct_count"),
-            func.count(Extraction.field_id).label("total_count"),
-        )
-        .group_by(Extraction.filename, Extraction.document_id)
-        .subquery()
-    )
-
-    stp_query = db.query(
-        subquery.c.filename,
-        subquery.c.document_id,
-        case((subquery.c.correct_count == subquery.c.total_count, 1), else_=0).label(
-            "stp"
-        ),
-    ).all()
-
     # Query: Overall STP Rate
     stp_subquery = (
         select(
@@ -204,16 +181,10 @@ def get_stp_dashboard(db: Session = Depends(get_db)):
         for row in accuracy_query
     ]
 
-    stp_data = [
-        {"filename": row.filename, "document_id": row.document_id, "stp": bool(row.stp)}
-        for row in stp_query
-    ]
-
     overall_stp = {"stp_rate_percentage": overall_stp_query}
 
     return {
         "accuracy_data": accuracy_data,
-        "stp_data": stp_data,
         "overall_stp": overall_stp,
     }
 
