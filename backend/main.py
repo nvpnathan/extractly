@@ -26,11 +26,17 @@ def root():
     return {"message": "Welcome to the Extractly API"}
 
 
-# Extraction Stats Dashbaord endpoint to fetch all records
-# @app.get("/extractions/")
-# def get_extractions(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-#     extractions = db.query(Extraction).offset(skip).limit(limit).all()
-#     return {"data": extractions}
+# Endpoint to summarize stats
+@app.get("/extractions/stats/")
+def get_stats(db: Session = Depends(get_db)):
+    total_docs = db.query(Extraction.document_id).distinct().count()
+    total_fields = db.query(Extraction).count()
+    correct_fields = db.query(Extraction).filter(Extraction.is_correct).count()
+    return {
+        "total_documents": total_docs,
+        "total_fields": total_fields,
+        "correct_fields": correct_fields,
+    }
 
 
 # Classification Confidence Distribution (Bar Chart)
@@ -103,15 +109,6 @@ def get_classification_accuracy(db: Session = Depends(get_db)):
     ]
 
 
-# Endpoint to fetch records by document_id
-@app.get("/extractions/{document_id}")
-def get_extraction_by_document_id(document_id: str, db: Session = Depends(get_db)):
-    extractions = (
-        db.query(Extraction).filter(Extraction.document_id == document_id).all()
-    )
-    return {"data": extractions}
-
-
 # Document Accuracy Dashboard endpoint to fetch document stats
 @app.get("/document_stats", response_model=List[DocumentStats])
 def get_document_stats(
@@ -164,9 +161,6 @@ async def get_field_data(document_id: str, db: Session = Depends(get_db)):
         Extraction.is_correct,
         Extraction.confidence,
     ).filter(Extraction.document_id == document_id)
-
-    # Debugging: Log the generated SQL query for SQLite
-    print(str(query.statement.compile(compile_kwargs={"literal_binds": True})))
 
     results = query.all()
 
@@ -296,17 +290,4 @@ def get_stp_dashboard(db: Session = Depends(get_db)):
     return {
         "accuracy_data": accuracy_data,
         "overall_stp": overall_stp,
-    }
-
-
-# Endpoint to summarize stats
-@app.get("/extractions/stats/")
-def get_stats(db: Session = Depends(get_db)):
-    total_docs = db.query(Extraction.document_id).distinct().count()
-    total_fields = db.query(Extraction).count()
-    correct_fields = db.query(Extraction).filter(Extraction.is_correct).count()
-    return {
-        "total_documents": total_docs,
-        "total_fields": total_fields,
-        "correct_fields": correct_fields,
     }
