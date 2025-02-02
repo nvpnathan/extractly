@@ -135,6 +135,19 @@
           <h3 class="card-title">Straight Through Processing (STP)</h3>
         </div>
         <div class="card-body">
+          <!-- Filters for Filename and Document ID -->
+          <div class="filters mb-3">
+            <div class="form-group">
+              <label for="stp-filename-filter">Filename</label>
+              <input type="text" id="stp-filename-filter" class="form-control" placeholder="Enter filename">
+            </div>
+            <div class="form-group">
+              <label for="stp=document-id-filter">Document ID</label>
+              <input type="text" id="stp-document-id-filter" class="form-control" placeholder="Enter document ID">
+            </div>
+            <button id="apply-filters" class="btn btn-primary mt-2">Apply Filters</button>
+          </div>
+
           <!-- Overall STP Rate -->
           <h4>Overall STP Rate: <span id="overall-stp-rate">Loading...</span>%</h4>
           <div class="chart-container">
@@ -158,39 +171,8 @@
               </tbody>
             </table>
           </div>
-          <!-- Modal for Document Details -->
-          <div class="modal fade" id="document-details-modal" tabindex="-1" aria-labelledby="documentDetailsModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="documentDetailsModalLabel">Document Fields</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                  <table class="table" id="document-fields-table">
-                    <thead>
-                      <tr>
-                        <th>Field</th>
-                        <th>Value</th>
-                        <th>Validated Value</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <!-- Field data will load here dynamically -->
-                    </tbody>
-                  </table>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
-      <!-- Field Extraction Data Dashboard -->
-    </div>
-  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="script.js"></script>

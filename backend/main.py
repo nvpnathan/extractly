@@ -88,7 +88,7 @@ def get_top_classifiers(db: Session = Depends(get_db)):
 
 
 # Classification Accuracy by Document Type (Line Chart)
-@app.get("/classification_accuracy/")
+@app.get("/classification_accuracy")
 def get_classification_accuracy(db: Session = Depends(get_db)):
     data = (
         db.query(
@@ -223,9 +223,15 @@ async def get_field_stats(db: Session = Depends(get_db)):
 
 
 # STP Dashboard endpoint to fetch STP data
-@app.get("/stp_dashboard/")
-def get_stp_dashboard(db: Session = Depends(get_db)):
-    # Query: Model Output Accuracy by Document
+@app.get("/stp_dashboard")
+def get_stp_dashboard(
+    db: Session = Depends(get_db),
+    filename: str = Query(None, alias="filename"),  # Optional filter by filename
+    document_id: str = Query(
+        None, alias="document_id"
+    ),  # Optional filter by document_id
+):
+    # Start the base query for Model Output Accuracy by Document
     accuracy_query = (
         db.query(
             Extraction.filename,
@@ -238,9 +244,24 @@ def get_stp_dashboard(db: Session = Depends(get_db)):
                 / func.count(Extraction.field_id),
                 2,
             ).label("accuracy_percentage"),
+        ).filter(
+            Extraction.confidence.isnot(None)
+        )  # Optional: to avoid null confidence
+    )
+
+    # Apply filters if provided
+    if filename:
+        accuracy_query = accuracy_query.filter(
+            Extraction.filename.ilike(f"%{filename}%")
         )
-        .group_by(Extraction.filename, Extraction.document_id)
-        .all()
+    if document_id:
+        accuracy_query = accuracy_query.filter(
+            Extraction.document_id.ilike(f"%{document_id}%")
+        )
+
+    # Group by the necessary fields for the accuracy query
+    accuracy_query = accuracy_query.group_by(
+        Extraction.filename, Extraction.document_id
     )
 
     # Query: Overall STP Rate
@@ -250,10 +271,22 @@ def get_stp_dashboard(db: Session = Depends(get_db)):
             Extraction.document_id,
             func.sum(cast(Extraction.is_correct, Integer)).label("correct_count"),
             func.count(Extraction.field_id).label("total_count"),
-        )
-        .group_by(Extraction.filename, Extraction.document_id)
-        .subquery()
+        ).filter(
+            Extraction.confidence.isnot(None)
+        )  # Optional: to avoid null confidence
     )
+
+    # Apply filters to subquery
+    if filename:
+        stp_subquery = stp_subquery.filter(Extraction.filename.ilike(f"%{filename}%"))
+    if document_id:
+        stp_subquery = stp_subquery.filter(
+            Extraction.document_id.ilike(f"%{document_id}%")
+        )
+
+    stp_subquery = stp_subquery.group_by(
+        Extraction.filename, Extraction.document_id
+    ).subquery()
 
     overall_stp_query = (
         db.query(
@@ -273,7 +306,7 @@ def get_stp_dashboard(db: Session = Depends(get_db)):
         .scalar()
     )
 
-    # Format results
+    # Format results for accuracy
     accuracy_data = [
         {
             "filename": row.filename,
