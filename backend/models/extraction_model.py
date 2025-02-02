@@ -10,6 +10,7 @@ from sqlalchemy import (
 from sqlalchemy.sql import func
 from database import Base
 from pydantic import BaseModel
+from typing import Optional
 
 
 class Extraction(Base):
@@ -53,3 +54,11 @@ class DocumentStats(BaseModel):
     filename: str
     avg_field_accuracy: float
     avg_ocr_accuracy: float
+
+
+class FieldData(BaseModel):
+    field: str
+    field_value: Optional[str]
+    validated_field_value: Optional[str]
+    is_correct: bool
+    confidence: Optional[float]

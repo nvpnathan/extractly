@@ -1,9 +1,9 @@
-from fastapi import FastAPI, Depends, Query
+from fastapi import FastAPI, Depends, Query, HTTPException
 from sqlalchemy import func, Integer, Float, select, case, cast, or_, and_
 from sqlalchemy.orm import Session
 from database import get_db
 from models.classification_model import Classification
-from models.extraction_model import Extraction, DocumentStats, FieldStats
+from models.extraction_model import Extraction, DocumentStats, FieldStats, FieldData
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 
@@ -27,10 +27,10 @@ def root():
 
 
 # Extraction Stats Dashbaord endpoint to fetch all records
-@app.get("/extractions/")
-def get_extractions(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-    extractions = db.query(Extraction).offset(skip).limit(limit).all()
-    return {"data": extractions}
+# @app.get("/extractions/")
+# def get_extractions(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+#     extractions = db.query(Extraction).offset(skip).limit(limit).all()
+#     return {"data": extractions}
 
 
 # Classification Confidence Distribution (Bar Chart)
@@ -148,6 +148,45 @@ def get_document_stats(
             avg_ocr_accuracy=row.avg_ocr_accuracy,
         )
         for row in stats
+    ]
+
+
+@app.get("/field_data", response_model=List[FieldData])
+async def get_field_data(document_id: str, db: Session = Depends(get_db)):
+    # Debugging: Log the received document_id
+    print(f"Received document_id: {document_id}")
+
+    # Query the database for field data based on document_id
+    query = db.query(
+        Extraction.field,
+        Extraction.field_value,
+        Extraction.validated_field_value,
+        Extraction.is_correct,
+        Extraction.confidence,
+    ).filter(Extraction.document_id == document_id)
+
+    # Debugging: Log the generated SQL query for SQLite
+    print(str(query.statement.compile(compile_kwargs={"literal_binds": True})))
+
+    results = query.all()
+
+    # Handle case where no data is found
+    if not results:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No field data found for document ID: {document_id}",
+        )
+
+    # Format and return results
+    return [
+        FieldData(
+            field=row.field,
+            field_value=row.field_value,
+            validated_field_value=row.validated_field_value,
+            is_correct=row.is_correct,
+            confidence=row.confidence,
+        )
+        for row in results
     ]
 
 

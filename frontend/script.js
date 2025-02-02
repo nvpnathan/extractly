@@ -224,7 +224,107 @@ function renderChart(labels, datasets) {
   });
 }
 
-// Load Document Accuracy by Field Stats
+// Document Accuracy Dashboard
+async function loadDocumentStats() {
+  const tableBody = document.querySelector('#document-stats-table tbody');
+  const filenameFilter = document.querySelector('#filename-filter').value;
+  const documentIdFilter = document.querySelector('#document-id-filter').value;
+
+  try {
+    // Construct query parameters based on filter inputs
+    let url = `${API_BASE_URL}/document_stats`;
+    const params = new URLSearchParams();
+
+    if (filenameFilter) {
+      params.append('filename', filenameFilter);
+    }
+
+    if (documentIdFilter) {
+      params.append('document_id', documentIdFilter);
+    }
+
+    if (params.toString()) {
+      url += `?${params.toString()}`;
+    }
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    // Render document stats
+    tableBody.innerHTML = '';
+    data.forEach(stat => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>
+          <a href="#" onclick="showFieldData(event, '${stat.document_id}', '${stat.filename}')">
+            ${stat.filename}
+          </a>
+        </td>
+        <td>${stat.document_id}</td>
+        <td>${(stat.avg_field_accuracy * 100).toFixed(2)}%</td>
+        <td>${(stat.avg_ocr_accuracy * 100).toFixed(2)}%</td>
+      `;
+      tableBody.appendChild(row);
+    });
+  } catch (error) {
+    console.error('Error loading document stats:', error);
+  }
+}
+
+function showFieldData(event, document_id, filename) {
+  // Prevent default link behavior
+  event.preventDefault();
+
+  // Log the clicked document for debugging
+  console.log(`Fetching field data for Document ID: ${document_id}, Filename: ${filename}`);
+
+  // Update the modal filename
+  document.getElementById('modal-filename').innerText = filename;
+
+  // Fetch field data via API
+  fetch(`${API_BASE_URL}/field_data?document_id=${document_id}`)
+    .then(response => response.json())
+    .then(fieldData => {
+      // Log data for debugging
+      console.log(fieldData);
+
+      // Populate the table
+      const tableBody = document.getElementById('field-data-table-body');
+      tableBody.innerHTML = ''; // Clear existing rows
+      fieldData.forEach(field => {
+        const row = document.createElement('tr');
+
+        // Safely handle undefined or null values for all fields
+        const name = field.field || 'N/A';
+        const value = field.field_value || 'N/A';
+        const validatedValue = field.validated_field_value || 'N/A';
+        const isCorrect = field.is_correct ? 'Yes' : 'No';
+        const confidence = field.confidence !== null && field.confidence !== undefined
+          ? field.confidence.toFixed(2)
+          : 'N/A';
+
+        // Render the row with updated field names
+        row.innerHTML = `
+          <td>${name}</td>
+          <td>${value}</td>
+          <td>${validatedValue}</td>
+          <td>${isCorrect}</td>
+          <td>${confidence}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+
+      // Show the modal using Bootstrap
+      const modal = new bootstrap.Modal(document.getElementById('fieldDataModal'));
+      modal.show();
+    })
+    .catch(error => {
+      console.error('Error fetching field data:', error);
+    });
+}
+
+
+// Load Field Stats Dashboard
 async function loadFieldStats() {
   const ctx = document.getElementById('fieldStatsChart').getContext('2d');
 
@@ -277,34 +377,6 @@ async function loadFieldStats() {
     });
   } catch (error) {
     console.error('Error loading field stats:', error);
-  }
-}
-
-// Fetch and render table data
-async function loadTableData() {
-  const tableBody = document.querySelector("#data-table tbody");
-
-  try {
-    const response = await fetch(`${API_BASE_URL}/extractions/`);
-    const { data } = await response.json();
-
-    tableBody.innerHTML = data
-      .map(
-        (item) => `
-      <tr>
-        <td>${item.filename}</td>
-        <td>${item.document_id}</td>
-        <td>${item.field}</td>
-        <td>${item.field_value || "N/A"}</td>
-        <td>${item.validated_field_value || "N/A"}</td>
-        <td>${item.confidence ? item.confidence.toFixed(2) : "N/A"}</td>
-      </tr>
-    `
-      )
-      .join("");
-  } catch (error) {
-    tableBody.innerHTML = `<tr><td colspan="6" class="text-danger">Failed to load data.</td></tr>`;
-    console.error("Error fetching table data:", error);
   }
 }
 
@@ -377,84 +449,6 @@ async function loadTableData() {
     });
   }
 
-
-// Fetch the document stats from the backend
-async function loadDocumentStats() {
-  const tableBody = document.querySelector('#document-stats-table tbody');
-  const filenameFilter = document.querySelector('#filename-filter').value;
-  const documentIdFilter = document.querySelector('#document-id-filter').value;
-
-  try {
-    // Construct query parameters based on filter inputs
-    let url = `${API_BASE_URL}/document_stats`;
-    const params = new URLSearchParams();
-
-    if (filenameFilter) {
-      params.append('filename', filenameFilter);
-    }
-
-    if (documentIdFilter) {
-      params.append('document_id', documentIdFilter);
-    }
-
-    if (params.toString()) {
-      url += `?${params.toString()}`;
-    }
-
-    const response = await fetch(url);
-    const data = await response.json();
-
-    // Render document stats
-    tableBody.innerHTML = '';
-    data.forEach(stat => {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>
-          <a href="#" onclick="showFieldData('${stat.document_id}', '${stat.filename}')">
-            ${stat.filename}
-          </a>
-        </td>
-        <td>${stat.document_id}</td>
-        <td>${(stat.avg_field_accuracy * 100).toFixed(2)}%</td>
-        <td>${(stat.avg_ocr_accuracy * 100).toFixed(2)}%</td>
-      `;
-      tableBody.appendChild(row);
-    });
-  } catch (error) {
-    console.error('Error loading document stats:', error);
-  }
-}
-
-// Fetch and display field data in a modal
-async function showFieldData(documentId, filename) {
-  try {
-    const response = await fetch(`${API_BASE_URL}/field_data?document_id=${documentId}`);
-    const fieldData = await response.json();
-
-    const modalFilename = document.getElementById("modal-filename");
-    modalFilename.textContent = filename;
-
-    const fieldDataTableBody = document.getElementById("field-data-table-body");
-    fieldDataTableBody.innerHTML = "";
-
-    fieldData.forEach(field => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${field.field_name}</td>
-        <td>${field.field_value}</td>
-        <td>${field.field_accuracy ? (field.field_accuracy * 100).toFixed(2) + '%' : 'N/A'}</td>
-      `;
-      fieldDataTableBody.appendChild(row);
-    });
-
-    // Show the modal
-    const fieldDataModal = new bootstrap.Modal(document.getElementById("fieldDataModal"));
-    fieldDataModal.show();
-  } catch (error) {
-    console.error('Error fetching field data:', error);
-  }
-}
-
 // Initialize the app
 document.addEventListener("DOMContentLoaded", () => {
   loadStats();
@@ -462,7 +456,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadTopClassifiersChart();
   loadClassificationAccuracyChart();
   loadFieldStats();
-  loadTableData();
+//  loadTableData();
   loadDocumentStats();
   loadSTPDashboard();
 });
