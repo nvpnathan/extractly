@@ -1,10 +1,10 @@
 from fastapi import FastAPI, Depends, Query, HTTPException
 from sqlalchemy import func, Integer, Float, select, case, cast, or_, and_
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from database import get_db
 from models.classification_model import Classification
 from models.extraction_model import Extraction, DocumentStats, FieldStats, FieldData
-from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 
 
@@ -148,6 +148,7 @@ def get_document_stats(
     ]
 
 
+# Fetch field data via document_id
 @app.get("/field_data", response_model=List[FieldData])
 async def get_field_data(document_id: str, db: Session = Depends(get_db)):
     # Debugging: Log the received document_id

@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://127.0.0.1:8000"; // Update if backend runs on a different URL/port
+const API_BASE_URL = window.API_BASE_URL;
 
 // Fetch and render stats
 async function loadStats() {
