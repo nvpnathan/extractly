@@ -187,6 +187,9 @@ Each endpoint supports standard HTTP response codes:
 ## TODO
 
 &#9745; Group Classification Confidence Distribution into % buckets
+
 &#9745; Limit Document Accuracy to limit of 20 with scroll
-&#9744; Field Extraction data should be linked to Document Accuracy by filename
-&#9744; Add conditional to prevent negative confidence scores to Field Extraction
+
+&#9745; Field Extraction data should be linked to Document Accuracy by filename
+
+&#9745; Add conditional to prevent negative confidence scores to Field Extraction

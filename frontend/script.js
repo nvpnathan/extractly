@@ -1,4 +1,4 @@
-const API_BASE_URL = window.API_BASE_URL;
+const API_BASE_URL = "http://127.0.0.1:8000";
 
 // Fetch and render stats
 async function loadStats() {
@@ -271,6 +271,39 @@ async function loadDocumentStats() {
   }
 }
 
+// Sort table by column
+function sortTable(columnIndex) {
+  const table = document.getElementById("document-stats-table");
+  const rows = Array.from(table.rows).slice(1); // Exclude the header row
+  const isNumericColumn = columnIndex >= 2; // Avg Field Accuracy and Avg OCR Accuracy are numeric
+
+  // Determine sort direction based on header's data attribute
+  const header = table.rows[0].cells[columnIndex];
+  const sortDirection = header.dataset.sort === "asc" ? "desc" : "asc";
+  header.dataset.sort = sortDirection;
+
+  // Sort rows based on column content
+  rows.sort((rowA, rowB) => {
+    const cellA = rowA.cells[columnIndex].textContent.trim();
+    const cellB = rowB.cells[columnIndex].textContent.trim();
+
+    if (isNumericColumn) {
+      return sortDirection === "asc"
+        ? parseFloat(cellA) - parseFloat(cellB)
+        : parseFloat(cellB) - parseFloat(cellA);
+    } else {
+      return sortDirection === "asc"
+        ? cellA.localeCompare(cellB)
+        : cellB.localeCompare(cellA);
+    }
+  });
+
+  // Re-append sorted rows to the table
+  const tbody = table.querySelector("tbody");
+  rows.forEach((row) => tbody.appendChild(row));
+}
+
+// Show field data in a modal
 function showFieldData(event, document_id, filename) {
   // Prevent default link behavior
   event.preventDefault();
