@@ -100,18 +100,18 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <table class="table">
+              <table class="table mt-4" id="field-data-table">
                 <thead>
                   <tr>
-                    <th>Field Name</th>
-                    <th>Field Value</th>
-                    <th>Validated Value</th>
-                    <th>Is Correct</th>
-                    <th>Confidence</th>
+                    <th onclick="sortFieldDataTable(0)">Field Name</th>
+                    <th onclick="sortFieldDataTable(1)">Extracted Value</th>
+                    <th onclick="sortFieldDataTable(2)">Validated Value</th>
+                    <th onclick="sortFieldDataTable(3)">Is Correct</th>
+                    <th onclick="sortFieldDataTable(4)">Confidence</th>
                   </tr>
                 </thead>
                 <tbody id="field-data-table-body">
-                  <!-- Field data will load here dynamically -->
+                  <!-- Data loads dynamically -->
                 </tbody>
               </table>
             </div>

@@ -314,20 +314,17 @@ function showFieldData(event, document_id, filename) {
   // Update the modal filename
   document.getElementById('modal-filename').innerText = filename;
 
-  // Fetch field data via API
   fetch(`${API_BASE_URL}/field_data?document_id=${document_id}`)
     .then(response => response.json())
     .then(fieldData => {
-      // Log data for debugging
       console.log(fieldData);
 
-      // Populate the table
       const tableBody = document.getElementById('field-data-table-body');
-      tableBody.innerHTML = ''; // Clear existing rows
+      tableBody.innerHTML = '';
+
       fieldData.forEach(field => {
         const row = document.createElement('tr');
 
-        // Safely handle undefined or null values for all fields
         const name = field.field || 'N/A';
         const value = field.field_value || 'N/A';
         const validatedValue = field.validated_field_value || 'N/A';
@@ -336,7 +333,6 @@ function showFieldData(event, document_id, filename) {
           ? field.confidence.toFixed(2)
           : 'N/A';
 
-        // Render the row with updated field names
         row.innerHTML = `
           <td>${name}</td>
           <td>${value}</td>
@@ -347,13 +343,44 @@ function showFieldData(event, document_id, filename) {
         tableBody.appendChild(row);
       });
 
-      // Show the modal using Bootstrap
       const modal = new bootstrap.Modal(document.getElementById('fieldDataModal'));
       modal.show();
     })
     .catch(error => {
       console.error('Error fetching field data:', error);
     });
+}
+
+// Function to sort table columns in modal
+function sortFieldDataTable(columnIndex) {
+  const table = document.getElementById("field-data-table");
+  const rows = Array.from(table.rows).slice(1); // Exclude header row
+  const isNumericColumn = columnIndex === 4; // Confidence is numeric
+
+  // Get header element and toggle sort direction
+  const header = table.rows[0].cells[columnIndex];
+  const sortDirection = header.dataset.sort === "asc" ? "desc" : "asc";
+  header.dataset.sort = sortDirection;
+
+  // Sort logic
+  rows.sort((rowA, rowB) => {
+    const cellA = rowA.cells[columnIndex].textContent.trim();
+    const cellB = rowB.cells[columnIndex].textContent.trim();
+
+    if (isNumericColumn) {
+      return sortDirection === "asc"
+        ? parseFloat(cellA) - parseFloat(cellB)
+        : parseFloat(cellB) - parseFloat(cellA);
+    } else {
+      return sortDirection === "asc"
+        ? cellA.localeCompare(cellB)
+        : cellB.localeCompare(cellA);
+    }
+  });
+
+  // Append sorted rows
+  const tbody = table.querySelector("tbody");
+  rows.forEach(row => tbody.appendChild(row));
 }
 
 
