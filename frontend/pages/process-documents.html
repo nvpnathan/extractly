@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Process Documents</title>
+
+    <!-- Tabler CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/process-docs.css">
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <header class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="../index.html">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="process-documents.html">Process Documents</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <h1 class="mb-4">Process Documents</h1>
+
+        <!-- Document Upload Section -->
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">Upload Documents</h3>
+                <input type="file" id="document-upload" class="form-control" multiple>
+                <button class="btn btn-primary mt-3" onclick="processDocuments()">Process</button>
+            </div>
+        </div>
+
+        <!-- Document Processing Table -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <h3 class="card-title">Processed Documents</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Filename</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="document-list">
+                        <!-- Dynamically populated -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabler JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/js/tabler.min.js"></script>
+    <script src="../js/process-docs.js"></script>
+</body>
+</html>
