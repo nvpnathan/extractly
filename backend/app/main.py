@@ -2,9 +2,9 @@ from fastapi import FastAPI, Depends, Query, HTTPException
 from sqlalchemy import func, Integer, Float, select, case, cast, or_, and_
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from app.database import get_db
-from app.models.classification_model import Classification
-from app.models.extraction_model import Extraction, DocumentStats, FieldStats, FieldData
+from database import get_db
+from models.classification_model import Classification
+from models.extraction_model import Extraction, DocumentStats, FieldStats, FieldData
 from typing import List
 
 
