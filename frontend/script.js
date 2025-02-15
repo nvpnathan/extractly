@@ -1,4 +1,5 @@
 const API_BASE_URL = "http://127.0.0.1:8000";
+const DOCUMENT_FILE_PATH = "./pdfs/";
 
 // Fetch and render stats
 async function loadStats() {
@@ -303,16 +304,23 @@ function sortTable(columnIndex) {
   rows.forEach((row) => tbody.appendChild(row));
 }
 
-// Show field data in a modal
+// Show document field data in a modal
 function showFieldData(event, document_id, filename) {
-  // Prevent default link behavior
   event.preventDefault();
 
-  // Log the clicked document for debugging
   console.log(`Fetching field data for Document ID: ${document_id}, Filename: ${filename}`);
 
   // Update the modal filename
   document.getElementById('modal-filename').innerText = filename;
+
+  // Ensure the PDF viewer element exists before setting its source
+  const pdfViewer = document.getElementById('pdf-viewer');
+  if (pdfViewer) {
+    const pdfPath = `${DOCUMENT_FILE_PATH}${filename}`;
+    pdfViewer.src = pdfPath;
+  } else {
+    console.error("PDF viewer element not found in the DOM.");
+  }
 
   fetch(`${API_BASE_URL}/field_data?document_id=${document_id}`)
     .then(response => response.json())
@@ -343,11 +351,17 @@ function showFieldData(event, document_id, filename) {
         tableBody.appendChild(row);
       });
 
-      const modal = new bootstrap.Modal(document.getElementById('fieldDataModal'));
-      modal.show();
+      // Show the modal
+      const modalElement = document.getElementById('fieldDataModal');
+      if (modalElement) {
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+      } else {
+        console.error("Modal element not found.");
+      }
     })
     .catch(error => {
-      console.error('Error fetching field data:', error);
+      console.error("Error fetching field data:", error);
     });
 }
 

@@ -60,3 +60,12 @@ body {
 
   #stp-accuracy-table tbody tr {
     height: 50px; /* Adjust row height if needed */
+
+  }
+
+  /* Increase the modal width beyond Bootstrap's default */
+@media (min-width: 1200px) {
+  .modal-xl {
+    max-width: 95vw; /* 95% of the viewport width */
+  }
+}

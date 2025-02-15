@@ -93,27 +93,35 @@
 
       <!-- Modal for Field Data -->
       <div class="modal fade" id="fieldDataModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-xl"> <!-- Custom width applied -->
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title">Field Data for <span id="modal-filename"></span></h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-              <table class="table mt-4" id="field-data-table">
-                <thead>
-                  <tr>
-                    <th onclick="sortFieldDataTable(0)">Field Name</th>
-                    <th onclick="sortFieldDataTable(1)">Extracted Value</th>
-                    <th onclick="sortFieldDataTable(2)">Validated Value</th>
-                    <th onclick="sortFieldDataTable(3)">Is Correct</th>
-                    <th onclick="sortFieldDataTable(4)">Confidence</th>
-                  </tr>
-                </thead>
-                <tbody id="field-data-table-body">
-                  <!-- Data loads dynamically -->
-                </tbody>
-              </table>
+            <div class="modal-body d-flex">
+              <!-- PDF Viewer -->
+              <div class="pdf-container" style="width: 55%; height: 750px; border-right: 2px solid #ddd; padding-right: 15px;">
+                <iframe id="pdf-viewer" width="100%" height="100%" style="border: none;"></iframe>
+              </div>
+
+              <!-- Field Data Table -->
+              <div class="table-container" style="width: 45%; padding-left: 15px; overflow-y: auto; max-height: 750px;">
+                <table class="table mt-4" id="field-data-table">
+                  <thead>
+                    <tr>
+                      <th onclick="sortFieldDataTable(0)">Field Name</th>
+                      <th onclick="sortFieldDataTable(1)">Extracted Value</th>
+                      <th onclick="sortFieldDataTable(2)">Validated Value</th>
+                      <th onclick="sortFieldDataTable(3)">Is Correct</th>
+                      <th onclick="sortFieldDataTable(4)">Confidence</th>
+                    </tr>
+                  </thead>
+                  <tbody id="field-data-table-body">
+                    <!-- Data loads dynamically -->
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
