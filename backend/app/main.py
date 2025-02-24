@@ -2,14 +2,20 @@ from fastapi import FastAPI, Depends, Query, HTTPException
 from sqlalchemy import func, Integer, Float, select, case, cast, or_, and_
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from typing import List
 from database import get_db
+from api.discovery_routes import router as discovery_router
 from models.classification_model import Classification
 from models.extraction_model import Extraction, DocumentStats, FieldStats, FieldData
-from typing import List
 
 
 app = FastAPI()
 
+# Include the discovery routes with dependencies
+app.include_router(discovery_router, prefix="/api/discovery")
+
+
+# Add CORS middleware to allow all origins
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[

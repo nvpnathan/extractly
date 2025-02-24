@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discovery</title>
+
+    <!-- Tabler CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="../index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="discovery.html">Discovery</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mt-4">
+        <h1 class="mb-4">Discovery</h1>
+
+        <!-- Boolean Sliders -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h3 class="card-title">Settings</h3>
+
+                <label class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="validate_classification" onchange="toggleSetting('validate_classification')">
+                    <span class="form-check-label">Validate Classification</span>
+                </label>
+
+                <label class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="validate_extraction" onchange="toggleSetting('validate_extraction'); toggleExtractionLater();">
+                    <span class="form-check-label">Validate Extraction</span>
+                </label>
+
+                <label class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="validate_extraction_later" onchange="toggleSetting('validate_extraction_later')">
+                    <span class="form-check-label">Validate Extraction Later</span>
+                </label>
+
+                <label class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="perform_classification" onchange="toggleSetting('perform_classification')">
+                    <span class="form-check-label">Perform Classification</span>
+                </label>
+
+                <label class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="perform_extraction" onchange="toggleSetting('perform_extraction')">
+                    <span class="form-check-label">Perform Extraction</span>
+                </label>
+            </div>
+        </div>
+
+        <script>
+        function toggleExtractionLater() {
+            const validateExtraction = document.getElementById("validate_extraction").checked;
+            const validateExtractionLater = document.getElementById("validate_extraction_later");
+
+            validateExtractionLater.disabled = validateExtraction;
+        }
+        </script>
+
+        <!-- Project Selection -->
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">Select Project</h3>
+
+                <!-- Search Input -->
+                <input type="text" id="project-search" class="form-control mb-3" placeholder="Search projects..." onkeyup="filterProjects()">
+
+                <!-- Scrollable Table -->
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                                <th>Select</th>
+                            </tr>
+                        </thead>
+                        <tbody id="project-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function populateProjects(projects) {
+                const tableBody = document.getElementById("project-table-body");
+                tableBody.innerHTML = ""; // Clear previous results
+
+                projects.slice(0, 10).forEach(project => {  // Show only first 10 projects
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${project.name}</td>
+                        <td>${project.type}</td>
+                        <td>${project.description}</td>
+                        <td><input type="radio" name="project-select" value="${project.id}"></td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+        </script>
+
+        <!-- Classifier Selection -->
+        <div class="card mt-3">
+            <div class="card-body">
+                <h3 class="card-title">Select Classifier</h3>
+                <select id="classifier-select" class="form-select" onchange="fetchClassifiers(project.id)" disabled>
+                    <option value="">Select a Classifier</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Extractor Selection -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <h3 class="card-title">Select Extractors</h3>
+                <div id="extractor-list">
+                    <!-- Checkboxes populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/js/tabler.min.js"></script>
+    <script src="../js/discovery.js"></script>
+    <script>
+        function toggleExtractionLater() {
+            document.getElementById("validate-extraction-later").disabled =
+                !document.getElementById("validate-extraction").checked;
+        }
+    </script>
+</body>
+</html>
