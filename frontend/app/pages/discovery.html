@@ -28,6 +28,12 @@
     <div class="container mt-4">
         <h1 class="mb-4">Discovery</h1>
 
+        <!-- Status Message Area -->
+        <div id="status-message" class="mb-3" style="display: none;"></div>
+
+        <!-- Selected Project Information -->
+        <div id="selected-project-info" class="mb-3"></div>
+
         <!-- Boolean Sliders -->
         <div class="card mb-4">
             <div class="card-body">
@@ -60,15 +66,6 @@
             </div>
         </div>
 
-        <script>
-        function toggleExtractionLater() {
-            const validateExtraction = document.getElementById("validate_extraction").checked;
-            const validateExtractionLater = document.getElementById("validate_extraction_later");
-
-            validateExtractionLater.disabled = validateExtraction;
-        }
-        </script>
-
         <!-- Project Selection -->
         <div class="card">
             <div class="card-body">
@@ -96,50 +93,114 @@
             </div>
         </div>
 
-        <script>
-            function populateProjects(projects) {
-                const tableBody = document.getElementById("project-table-body");
-                tableBody.innerHTML = ""; // Clear previous results
-
-                projects.slice(0, 10).forEach(project => {  // Show only first 10 projects
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
-                        <td>${project.name}</td>
-                        <td>${project.type}</td>
-                        <td>${project.description}</td>
-                        <td><input type="radio" name="project-select" value="${project.id}"></td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-            }
-        </script>
-
         <!-- Classifier Selection -->
         <div class="card mt-3">
             <div class="card-body">
                 <h3 class="card-title">Select Classifier</h3>
-                <select id="classifier-select" class="form-select" onchange="fetchClassifiers(project.id)" disabled>
-                    <option value="">Select a Classifier</option>
-                </select>
+
+                <!-- Search Input -->
+                <input type="text" id="classifier-search" class="form-control mb-3" placeholder="Search classifiers..." onkeyup="filterClassifiers()">
+
+                <!-- Scrollable Table -->
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Select</th>
+                            </tr>
+                        </thead>
+                        <tbody id="classifier-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
         <!-- Extractor Selection -->
-        <div class="card mt-4">
+        <div class="card mt-3">
             <div class="card-body">
-                <h3 class="card-title">Select Extractors</h3>
-                <div id="extractor-list">
-                    <!-- Checkboxes populated dynamically -->
+                <h3 class="card-title">Select Extractor</h3>
+
+                <!-- Search Input -->
+                <input type="text" id="extractor-search" class="form-control mb-3" placeholder="Search extractors..." onkeyup="filterExtractors()">
+
+                <!-- Scrollable Table -->
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Select</th>
+                            </tr>
+                        </thead>
+                        <tbody id="extractor-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Extractor List -->
+                <div id="extractor-list" class="mt-3">
+                    <!-- Populated dynamically -->
                 </div>
             </div>
         </div>
+
+        <!-- Save Settings Button -->
+        <div class="d-flex justify-content-end mb-5">
+            <button id="save-settings-btn" class="btn btn-primary" onclick="saveAllSettings()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-device-floppy" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2"></path>
+                    <path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                    <path d="M14 4l0 4l-6 0l0 -4"></path>
+                </svg>
+                Save Settings
+            </button>
+        </div>
+
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/js/tabler.min.js"></script>
     <script src="../js/discovery.js"></script>
     <script>
         function toggleExtractionLater() {
-            document.getElementById("validate-extraction-later").disabled =
-                !document.getElementById("validate-extraction").checked;
+            const validateExtraction = document.getElementById("validate_extraction").checked;
+            const validateExtractionLater = document.getElementById("validate_extraction_later");
+
+            validateExtractionLater.disabled = validateExtraction;
+        }
+
+        // Function to show status messages
+        function showStatusMessage(message, type = 'success') {
+            const statusDiv = document.getElementById('status-message');
+            statusDiv.innerHTML = `<div class="alert alert-${type} alert-dismissible" role="alert">
+                ${message}
+                <a href="#" class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+            </div>`;
+            statusDiv.style.display = 'block';
+
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                const alert = document.querySelector('.alert');
+                if (alert) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }
+            }, 5000);
+        }
+
+        // Save all settings function
+        function saveAllSettings() {
+            // This function will trigger a complete save of all settings
+            updateSettings();
+            showStatusMessage('All settings saved successfully!');
         }
     </script>
 </body>

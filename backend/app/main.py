@@ -11,10 +11,6 @@ from models.extraction_model import Extraction, DocumentStats, FieldStats, Field
 
 app = FastAPI()
 
-# Include the discovery routes with dependencies
-app.include_router(discovery_router, prefix="/api/discovery")
-
-
 # Add CORS middleware to allow all origins
 app.add_middleware(
     CORSMiddleware,
@@ -25,6 +21,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include the discovery routes with dependencies
+app.include_router(discovery_router, prefix="/api/discovery")
 
 
 @app.get("/")

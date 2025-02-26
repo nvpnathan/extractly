@@ -152,6 +152,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "fastapi" },
+    { name = "pydantic" },
     { name = "python-dotenv" },
     { name = "requests" },
     { name = "sqlalchemy" },
@@ -163,6 +164,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", specifier = ">=0.115.8" },
+    { name = "pydantic", specifier = ">=2.10.6" },
     { name = "python-dotenv", specifier = ">=1.0.1" },
     { name = "requests", specifier = ">=2.32.3" },
     { name = "sqlalchemy", specifier = ">=2.0.37" },

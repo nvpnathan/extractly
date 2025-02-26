@@ -15,16 +15,33 @@ This project provides a web-based dashboard to display document extraction stats
 .
 ├── README.md
 ├── backend
-│   ├── database.py
-│   ├── main.py
-│   ├── models
-│   │   └── extraction_model.py
+│   ├── Dockerfile
+│   ├── app
+│   │   ├── api
+│   │   ├── database.py
+│   │   ├── main.py
+│   │   └── models
+│   │       ├── __init__.py
+│   │       ├── classification_model.py
+│   │       └── extraction_model.py
 │   ├── pyproject.toml
 │   └── uv.lock
-└── frontend
-    ├── index.html
-    ├── script.js
-    └── style.css
+├── docker-compose.yml
+└──  frontend
+   ├── Dockerfile
+   └── app
+       ├── css
+       │   └── process-docs.css
+       ├── index.html
+       ├── js
+       │   └── process-docs.js
+       ├── pages
+       │   └── process-documents.html
+       ├── pdfs
+       │   ├── id_card.jpg
+       │   └── invoice.pdf
+       ├── script.js
+       └── style.css
 ```
 
 ## Dashboard
