@@ -1,6 +1,31 @@
+const API_BASE_URL = "http://127.0.0.1:8000/api/process-docs";
+
 document.addEventListener("DOMContentLoaded", () => {
     console.log("Process Documents page loaded");
+    fetchExistingFiles();
 });
+
+function fetchExistingFiles() {
+    fetch(`${API_BASE_URL}/files`)
+        .then(response => response.json())
+        .then(data => {
+            const fileList = document.getElementById("document-list");
+            data.files.forEach(file => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${file}</td>
+                    <td><span class="badge bg-success">Completed</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="viewDocument('${file}')">View</button>
+                    </td>
+                `;
+                fileList.appendChild(row);
+            });
+        })
+        .catch(error => {
+            console.error("Error fetching files:", error);
+        });
+}
 
 function processDocuments() {
     const fileInput = document.getElementById("document-upload");
@@ -22,17 +47,17 @@ function processDocuments() {
         `;
         fileList.appendChild(row);
 
-        // Upload file to ../pdf directory
+        // Upload file to FastAPI /upload endpoint
         const formData = new FormData();
-        formData.append("file", file);
+        formData.append("files", file);
 
-        fetch("../pdfs/", {
+        fetch(`${API_BASE_URL}/upload`, {
             method: "POST",
             body: formData
         })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
+            if (data.info) {
                 row.querySelector(".badge").classList.remove("bg-warning");
                 row.querySelector(".badge").classList.add("bg-success");
                 row.querySelector(".badge").innerText = "Completed";

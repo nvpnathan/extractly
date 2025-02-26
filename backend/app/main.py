@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from database import get_db
 from api.discovery_routes import router as discovery_router
+from api.process_docs import router as process_docs_router
 from models.classification_model import Classification
 from models.extraction_model import Extraction, DocumentStats, FieldStats, FieldData
 
@@ -22,8 +23,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include the discovery routes with dependencies
+# Include routes with dependencies
 app.include_router(discovery_router, prefix="/api/discovery")
+app.include_router(process_docs_router, prefix="/api/process-docs")
 
 
 @app.get("/")
