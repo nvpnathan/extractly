@@ -21,16 +21,34 @@ function processDocuments() {
             </td>
         `;
         fileList.appendChild(row);
-    });
 
-    // Simulate processing
-    setTimeout(() => {
-        document.querySelectorAll("#document-list .badge").forEach(badge => {
-            badge.classList.remove("bg-warning");
-            badge.classList.add("bg-success");
-            badge.innerText = "Completed";
+        // Upload file to ../pdf directory
+        const formData = new FormData();
+        formData.append("file", file);
+
+        fetch("../pdfs/", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                row.querySelector(".badge").classList.remove("bg-warning");
+                row.querySelector(".badge").classList.add("bg-success");
+                row.querySelector(".badge").innerText = "Completed";
+            } else {
+                row.querySelector(".badge").classList.remove("bg-warning");
+                row.querySelector(".badge").classList.add("bg-danger");
+                row.querySelector(".badge").innerText = "Failed";
+            }
+        })
+        .catch(error => {
+            console.error("Error uploading file:", error);
+            row.querySelector(".badge").classList.remove("bg-warning");
+            row.querySelector(".badge").classList.add("bg-danger");
+            row.querySelector(".badge").innerText = "Failed";
         });
-    }, 2000);
+    });
 }
 
 function viewDocument(filename) {

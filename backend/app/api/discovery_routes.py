@@ -8,10 +8,15 @@ from config.project_config import CACHE_DIR, CACHE_FILE
 from config.project_config import BASE_URL
 from api.auth import initialize_authentication
 
-
-# Initialize Authentication
+# Initialize authentication
 auth = initialize_authentication()
-bearer_token = auth.bearer_token
+
+
+def get_bearer_token():
+    """Returns the latest valid bearer token."""
+    return auth.get_bearer_token()
+
+
 base_url = BASE_URL
 
 router = APIRouter()
@@ -42,16 +47,17 @@ def ensure_cache_directory():
 def save_cache_to_file():
     """Save the current settings to a JSON file."""
     ensure_cache_directory()
-    with open(CACHE_FILE, "w") as cache_file:
+    with open(CACHE_FILE, "w", encoding="utf-8") as cache_file:
         json.dump(asdict(settings_cache), cache_file, indent=4)
 
 
 def load_cache_from_file():
     """Load settings from a JSON file if it exists."""
     global settings_cache
+    settings_cache = AppSettings()
 
     if os.path.exists(CACHE_FILE):
-        with open(CACHE_FILE, "r") as cache_file:
+        with open(CACHE_FILE, "r", encoding="utf-8") as cache_file:
             data = json.load(cache_file)
 
             # Update the settings dataclass with loaded values
@@ -67,19 +73,15 @@ load_cache_from_file()
 @router.get("/settings")
 def get_settings():
     """Retrieve stored settings from the dataclass."""
-    return {
-        "validate_classification": settings_cache.validate_classification,
-        "validate_extraction": settings_cache.validate_extraction,
-        "validate_extraction_later": settings_cache.validate_extraction_later,
-        "perform_classification": settings_cache.perform_classification,
-        "perform_extraction": settings_cache.perform_extraction,
-    }
+    return settings_cache
 
 
 @router.post("/settings")
 def update_settings(settings: Settings):
     """Update user settings in the dataclass and save to cache file."""
-    settings_dict = settings.dict()
+    global settings_cache  # Ensure we modify the global instance
+
+    settings_dict = settings.model_dump()
     for key, value in settings_dict.items():
         if hasattr(settings_cache, key):
             setattr(settings_cache, key, value)
@@ -92,7 +94,10 @@ def update_settings(settings: Settings):
 def get_projects():
     """Retrieve projects from API."""
     api_url = f"{base_url}?api-version=1.1"
-    headers = {"Authorization": f"Bearer {bearer_token}", "accept": "application/json"}
+    headers = {
+        "Authorization": f"Bearer {get_bearer_token()}",
+        "accept": "application/json",
+    }
 
     try:
         response = requests.get(api_url, headers=headers, timeout=300)
@@ -113,7 +118,10 @@ def get_projects():
 def get_classifiers(project_id: str):
     """Retrieve classifiers from API."""
     api_url = f"{base_url}/{project_id}/classifiers?api-version=1.1"
-    headers = {"Authorization": f"Bearer {bearer_token}", "accept": "application/json"}
+    headers = {
+        "Authorization": f"Bearer {get_bearer_token()}",
+        "accept": "application/json",
+    }
 
     try:
         response = requests.get(api_url, headers=headers, timeout=300)
@@ -134,7 +142,10 @@ def get_classifiers(project_id: str):
 def get_extractors(project_id: str):
     """Retrieve extractors from API."""
     api_url = f"{base_url}/{project_id}/extractors?api-version=1.1"
-    headers = {"Authorization": f"Bearer {bearer_token}", "accept": "application/json"}
+    headers = {
+        "Authorization": f"Bearer {get_bearer_token()}",
+        "accept": "application/json",
+    }
 
     try:
         response = requests.get(api_url, headers=headers, timeout=300)

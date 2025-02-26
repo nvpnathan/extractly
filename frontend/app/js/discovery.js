@@ -428,21 +428,16 @@ function fetchExtractors(projectId) {
                     }
                 });
 
+                // Check the checkbox if the extractor is already selected
+                if (settings.project.extractor_ids && settings.project.extractor_ids[extractor.id]) {
+                    checkbox.checked = true;
+                }
+
                 extractorTableBody.appendChild(row);
             });
         })
         .catch(error => console.error("Error fetching extractors:", error));
 }
-
-// Add event listener for the classifier dropdown
-document.addEventListener("DOMContentLoaded", () => {
-    const classifierSelect = document.getElementById("classifier-select");
-    if (classifierSelect) {
-        classifierSelect.addEventListener("change", (e) => {
-            selectClassifier(e.target.value);
-        });
-    }
-});
 
 function selectClassifier(classifierId) {
     // Find the classifier details
