@@ -1,5 +1,5 @@
 const API_BASE_URL = "http://127.0.0.1:8000";
-const DOCUMENT_FILE_PATH = "./pdfs/";
+const DOCUMENT_FILE_PATH = "/Users/nathanness/repos/DU-Cloud-APIs/Paystub-600-evalset/";
 
 // Fetch and render stats
 async function loadStats() {

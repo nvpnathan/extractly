@@ -3,7 +3,7 @@ from sqlalchemy import func, Integer, Float, select, case, cast, or_, and_
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
-from database import get_db
+from database.database import get_db
 from api.discovery_routes import router as discovery_router
 from api.process_docs import router as process_docs_router
 from models.classification_model import Classification

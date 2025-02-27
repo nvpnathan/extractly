@@ -23,7 +23,7 @@ router = APIRouter()
 
 
 @dataclass
-class AppSettings:
+class ProcessingConfig:
     """Data class to store application settings."""
 
     validate_classification: bool = False
@@ -35,7 +35,7 @@ class AppSettings:
 
 
 # Global settings instance
-settings_cache = AppSettings()
+settings_cache = ProcessingConfig()
 
 
 def ensure_cache_directory():
@@ -54,7 +54,7 @@ def save_cache_to_file():
 def load_cache_from_file():
     """Load settings from a JSON file if it exists."""
     global settings_cache
-    settings_cache = AppSettings()
+    settings_cache = ProcessingConfig()
 
     if os.path.exists(CACHE_FILE):
         with open(CACHE_FILE, "r", encoding="utf-8") as cache_file:
@@ -163,6 +163,6 @@ def get_extractors(project_id: str):
 
 
 # Export the settings dataclass to make it accessible to other modules
-def get_settings_instance() -> AppSettings:
+def get_settings_instance() -> ProcessingConfig:
     """Return the current settings instance for use in other modules."""
     return settings_cache

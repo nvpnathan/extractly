@@ -6,7 +6,7 @@ from sqlalchemy import (
     DateTime,
 )
 from sqlalchemy.sql import func
-from database import Base
+from database.database import Base
 from pydantic import BaseModel
 
 
