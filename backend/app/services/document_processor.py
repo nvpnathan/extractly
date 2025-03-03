@@ -1,11 +1,9 @@
-from fastapi import FastAPI, UploadFile, File, BackgroundTasks
-from typing import List
+from fastapi import APIRouter, BackgroundTasks
 import os
-import shutil
 import logging
 from concurrent.futures import ThreadPoolExecutor
 from utils.write_results import WriteResults
-from config.project_setup import initialize_environment, load_prompts
+from config.project_setup import load_prompts, initialize_environment
 from api.discovery_routes import ProcessingConfig
 
 
@@ -13,7 +11,7 @@ from api.discovery_routes import ProcessingConfig
 clients = initialize_environment()
 digitize_client, classify_client, extract_client, validate_client = clients
 
-app = FastAPI()
+router = APIRouter()
 logging.basicConfig(level=logging.INFO)
 
 documents_status = {}
@@ -129,32 +127,13 @@ document_processor = DocumentProcessor(
 )
 
 
-@app.post("/upload/")
-async def upload_files(files: List[UploadFile] = File(...)):
-    uploaded_files = []
-    upload_dir = "uploaded_docs"
-    os.makedirs(upload_dir, exist_ok=True)
-
-    for file in files:
-        file_path = os.path.join(upload_dir, file.filename)
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-        documents_status[file.filename] = "Uploaded"
-        uploaded_files.append({"filename": file.filename})
-
-    return {"uploaded_files": uploaded_files}
-
-
-@app.post("/process/")
+@router.post("/process/")
 def process_documents(background_tasks: BackgroundTasks):
     for document_id, status in documents_status.items():
         if status == "Uploaded":
-            document_path = os.path.join(
-                "uploaded_docs", document_id
-            )  # Adjust as needed
+            document_path = os.path.join("cache/documents/")  # Adjust as needed
             background_tasks.add_task(
                 document_processor.process_document,
-                document_id,
                 document_path,
                 ProcessingConfig(),
             )
@@ -162,6 +141,6 @@ def process_documents(background_tasks: BackgroundTasks):
     return {"message": "Processing started"}
 
 
-@app.get("/status/")
+@router.get("/status/")
 def get_status():
     return documents_status

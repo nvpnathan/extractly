@@ -6,13 +6,15 @@ from services.digitize import Digitize
 from services.classify import Classify
 from services.extract import Extract
 from services.validate import Validate
-from api.discovery_routes import ProcessingConfig
+from api.discovery_routes import get_settings_instance
 from api.auth import initialize_authentication
-from config.project_config import CACHE_DIR, SQLITE_DB_PATH
+from config.project_config import BASE_URL, CACHE_DIR, SQLITE_DB_PATH
 
 
 # Load environment variables
 load_dotenv()
+
+base_url = BASE_URL
 
 # Initialize Authentication
 auth = initialize_authentication()
@@ -107,10 +109,11 @@ def ensure_database():
 
 # Function to initialize clients
 def initialize_clients(base_url: str, bearer_token: str):
-    digitize_client = Digitize(base_url, ProcessingConfig.project["id"], bearer_token)
-    classify_client = Classify(base_url, ProcessingConfig.project["id"], bearer_token)
-    extract_client = Extract(base_url, ProcessingConfig.project["id"], bearer_token)
-    validate_client = Validate(base_url, ProcessingConfig.project["id"], bearer_token)
+    config = get_settings_instance()
+    digitize_client = Digitize(base_url, config.project.id, bearer_token)
+    classify_client = Classify(base_url, config.project.id, bearer_token)
+    extract_client = Extract(base_url, config.project.id, bearer_token)
+    validate_client = Validate(base_url, config.project.id, bearer_token)
 
     return digitize_client, classify_client, extract_client, validate_client
 
@@ -131,6 +134,8 @@ def initialize_environment():
     """Initialize the processing environment."""
     # Load environment variables
     load_dotenv()
+
+    initialize_clients(base_url=base_url, bearer_token=get_bearer_token())
 
     # Ensure database exists
     ensure_database()

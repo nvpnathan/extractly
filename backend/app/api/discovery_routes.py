@@ -31,11 +31,17 @@ class ProcessingConfig:
     validate_extraction_later: bool = False
     perform_classification: bool = False
     perform_extraction: bool = False
-    project: ProjectSettings = field(default_factory=dict)
+    project: ProjectSettings = field(default_factory=ProjectSettings)
 
 
 # Global settings instance
 settings_cache = ProcessingConfig()
+
+
+# Export the settings dataclass to make it accessible to other modules
+def get_settings_instance() -> ProcessingConfig:
+    """Return the current settings instance for use in other modules."""
+    return settings_cache
 
 
 def ensure_cache_directory():
@@ -54,16 +60,30 @@ def save_cache_to_file():
 def load_cache_from_file():
     """Load settings from a JSON file if it exists."""
     global settings_cache
-    settings_cache = ProcessingConfig()
 
     if os.path.exists(CACHE_FILE):
         with open(CACHE_FILE, "r", encoding="utf-8") as cache_file:
             data = json.load(cache_file)
 
-            # Update the settings dataclass with loaded values
-            for key, value in data.items():
-                if hasattr(settings_cache, key):
-                    setattr(settings_cache, key, value)
+            # Ensure 'project' is correctly parsed as a ProjectSettings instance
+            project_data = data.get("project", {})
+            project_settings = (
+                ProjectSettings(**project_data)
+                if project_data
+                else ProjectSettings(id="", name="")
+            )
+
+            # Create a ProcessingConfig instance with the loaded values
+            settings_cache = ProcessingConfig(
+                validate_classification=data.get("validate_classification", False),
+                validate_extraction=data.get("validate_extraction", False),
+                validate_extraction_later=data.get("validate_extraction_later", False),
+                perform_classification=data.get("perform_classification", False),
+                perform_extraction=data.get("perform_extraction", False),
+                project=project_settings,
+            )
+    else:
+        settings_cache = ProcessingConfig()
 
 
 # Load settings on module initialization
@@ -160,9 +180,3 @@ def get_extractors(project_id: str):
         raise HTTPException(
             status_code=500, detail=f"Error fetching extractors: {str(e)}"
         )
-
-
-# Export the settings dataclass to make it accessible to other modules
-def get_settings_instance() -> ProcessingConfig:
-    """Return the current settings instance for use in other modules."""
-    return settings_cache
