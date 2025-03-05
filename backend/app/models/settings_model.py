@@ -17,7 +17,7 @@ class ClassifierSettings(BaseModel):
 class ProjectSettings(BaseModel):
     id: Optional[str] = None
     name: Optional[str] = None
-    classifier: Optional[ClassifierSettings] = None
+    classifier_id: Optional[ClassifierSettings] = None
     extractor_ids: Optional[Dict[str, Dict[str, str]]] = None
 
 

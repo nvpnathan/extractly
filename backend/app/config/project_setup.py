@@ -135,7 +135,7 @@ def initialize_environment():
     # Load environment variables
     load_dotenv()
 
-    initialize_clients(base_url=base_url, bearer_token=get_bearer_token())
+    # initialize_clients(base_url=base_url, bearer_token=get_bearer_token())
 
     # Ensure database exists
     ensure_database()

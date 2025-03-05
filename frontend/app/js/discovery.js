@@ -50,6 +50,8 @@ function fetchSettings() {
 }
 
 function updateSettings() {
+    // console.log("Sending settings:", settings);  // Debug log before sending
+
     fetch(`${API_BASE_URL}/settings`, {
         method: "POST",
         headers: {
@@ -57,7 +59,7 @@ function updateSettings() {
         },
         body: JSON.stringify(settings)
     })
-    .then(response => response.json())  // This will fail if the backend returns an error.
+    .then(response => response.json())
     .then(data => {
         console.log("Settings updated:", data);
     })
@@ -476,10 +478,4 @@ function showStatusMessage(message, type = 'success') {
             bsAlert.close();
         }
     }, 5000);
-}
-
-// Save all settings - triggered by the Save button
-function saveAllSettings() {
-    updateSettings();
-    showStatusMessage('All settings saved successfully!');
 }

@@ -4,14 +4,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
 from database.database import get_db
-from config.project_setup import initialize_environment
 from api.discovery_routes import router as discovery_router
 from api.process_docs import router as process_docs_router
 from services.document_processor import router as document_processor_router
 from models.classification_model import Classification
 from models.extraction_model import Extraction, DocumentStats, FieldStats, FieldData
 
-initialize_environment()
+# initialize_environment()
 
 app = FastAPI()
 
