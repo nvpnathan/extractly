@@ -105,7 +105,7 @@ def update_settings(settings: Settings):
     for key, value in settings_dict.items():
         if hasattr(settings_cache, key):
             setattr(settings_cache, key, value)
-
+    print(settings_cache)
     save_cache_to_file()
     return {"message": "Settings updated successfully."}
 

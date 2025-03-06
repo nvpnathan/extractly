@@ -131,11 +131,15 @@ def load_prompts(document_type_id: str) -> dict | None:
 
 
 def initialize_environment():
-    """Initialize the processing environment."""
+    """Initialize the processing environment and return initialized clients."""
     # Load environment variables
     load_dotenv()
 
-    # initialize_clients(base_url=base_url, bearer_token=get_bearer_token())
-
     # Ensure database exists
     ensure_database()
+
+    # Initialize clients with authentication
+    bearer_token = get_bearer_token()
+    clients = initialize_clients(base_url=base_url, bearer_token=bearer_token)
+
+    return clients

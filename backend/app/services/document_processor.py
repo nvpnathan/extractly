@@ -4,18 +4,27 @@ import logging
 from concurrent.futures import ThreadPoolExecutor
 from utils.write_results import WriteResults
 from config.project_setup import load_prompts, initialize_environment
-from api.discovery_routes import ProcessingConfig
+from api.discovery_routes import get_settings_instance
 
 
-# Initialize environment (clients, config, context)
-clients = initialize_environment()
-digitize_client, classify_client, extract_client, validate_client = clients
-
+# Initialize FastAPI router
 router = APIRouter()
 logging.basicConfig(level=logging.INFO)
 
 documents_status = {}
 executor = ThreadPoolExecutor()
+
+# Global clients and document processor
+clients = None
+document_processor = None
+
+
+def ensure_clients_initialized():
+    """Ensure clients are initialized before processing requests."""
+    global clients, document_processor
+
+    if clients is None or document_processor is None:
+        setup_clients(get_settings_instance())
 
 
 class DocumentProcessor:
@@ -27,9 +36,7 @@ class DocumentProcessor:
         self.extract_client = extract_client
         self.validate_client = validate_client
 
-    def process_document(
-        self, document_id: str, document_path: str, config: ProcessingConfig
-    ):
+    def process_document(self, document_id: str, document_path: str, config):
         try:
             documents_status[document_id] = "Digitizing"
             doc_id = self.digitize_client.digitize(document_path)
@@ -54,9 +61,7 @@ class DocumentProcessor:
             logging.error(f"Error processing {document_path}: {e}", exc_info=True)
             documents_status[document_id] = "Failed"
 
-    def classify_document(
-        self, document_id: str, document_path: str, config: ProcessingConfig
-    ):
+    def classify_document(self, document_id: str, document_path: str, config):
         prompts = (
             load_prompts("classification")
             if config.project.classifier.id == "generative_classifier"
@@ -74,7 +79,7 @@ class DocumentProcessor:
             logging.error(f"Classification failed for {document_id}: {e}")
             return None
 
-    def get_extractor(self, config: ProcessingConfig, document_type_id: str):
+    def get_extractor(self, config, document_type_id: str):
         extractor = (
             config.project.extractor_ids.get(document_type_id, {})
             if document_type_id
@@ -88,7 +93,7 @@ class DocumentProcessor:
         document_path: str,
         extractor_id: str,
         extractor_name: str,
-        config: ProcessingConfig,
+        config,
     ):
         prompts = (
             load_prompts(extractor_name)
@@ -122,20 +127,44 @@ class DocumentProcessor:
         ).write_results()
 
 
-document_processor = DocumentProcessor(
-    digitize_client, classify_client, extract_client, validate_client
-)
+def setup_clients(config=None):
+    """Initialize clients and document processor with updated settings."""
+    global clients, document_processor
+
+    if (
+        clients is None or document_processor is None
+    ):  # Ensure re-initialization is needed
+        clients = initialize_environment()
+        digitize_client, classify_client, extract_client, validate_client = clients
+        document_processor = DocumentProcessor(
+            digitize_client, classify_client, extract_client, validate_client
+        )
+
+
+# Ensure document processor is initialized
+setup_clients(get_settings_instance())
 
 
 @router.post("/process/")
 def process_documents(background_tasks: BackgroundTasks):
+    """API endpoint to process uploaded documents."""
+    ensure_clients_initialized()  # Ensure clients are set before proceeding
+
+    if document_processor is None:
+        return {"error": "Clients not initialized. Complete the UI wizard first."}
+
+    config = get_settings_instance()
+
     for document_id, status in documents_status.items():
         if status == "Uploaded":
-            document_path = os.path.join("cache/documents/")  # Adjust as needed
+            document_path = os.path.join(
+                "cache/documents/", document_id
+            )  # Ensure document ID is included
             background_tasks.add_task(
                 document_processor.process_document,
+                document_id,
                 document_path,
-                ProcessingConfig(),
+                config,  # Pass updated settings
             )
             documents_status[document_id] = "Processing"
     return {"message": "Processing started"}
@@ -143,4 +172,5 @@ def process_documents(background_tasks: BackgroundTasks):
 
 @router.get("/status/")
 def get_status():
+    """API endpoint to check document processing status."""
     return documents_status
