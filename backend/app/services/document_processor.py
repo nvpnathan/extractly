@@ -1,11 +1,13 @@
-from fastapi import APIRouter, BackgroundTasks
+from fastapi import APIRouter, BackgroundTasks, WebSocket, WebSocketDisconnect
 import os
+import json
+import asyncio
 import logging
 from concurrent.futures import ThreadPoolExecutor
 from utils.write_results import WriteResults
 from config.project_setup import load_prompts, initialize_environment
 from api.discovery_routes import get_settings_instance
-
+from database.db_utils import get_filenames_processing, fetch_document_statuses
 
 # Initialize FastAPI router
 router = APIRouter()
@@ -64,14 +66,14 @@ class DocumentProcessor:
     def classify_document(self, document_id: str, document_path: str, config):
         prompts = (
             load_prompts("classification")
-            if config.project.classifier.id == "generative_classifier"
+            if config.project.classifier_id.id == "generative_classifier"
             else None
         )
         try:
             return self.classify_client.classify_document(
                 document_path,
                 document_id,
-                config.project.classifier.id,
+                config.project.classifier_id.id,
                 prompts,
                 config.validate_classification,
             )
@@ -144,6 +146,9 @@ def setup_clients(config=None):
 # Ensure document processor is initialized
 setup_clients(get_settings_instance())
 
+# Store active WebSocket connections
+active_connections = set()
+
 
 @router.post("/process/")
 def process_documents(background_tasks: BackgroundTasks):
@@ -154,23 +159,48 @@ def process_documents(background_tasks: BackgroundTasks):
         return {"error": "Clients not initialized. Complete the UI wizard first."}
 
     config = get_settings_instance()
+    filenames = get_filenames_processing()
 
-    for document_id, status in documents_status.items():
-        if status == "Uploaded":
-            document_path = os.path.join(
-                "cache/documents/", document_id
-            )  # Ensure document ID is included
-            background_tasks.add_task(
-                document_processor.process_document,
-                document_id,
-                document_path,
-                config,  # Pass updated settings
-            )
-            documents_status[document_id] = "Processing"
-    return {"message": "Processing started"}
+    if not filenames:
+        return {"error": "No documents found for processing."}
+
+    processed_files = []
+
+    for (filename,) in filenames:
+        document_id = filename.rsplit(".", 1)[0]  # Remove file extension
+        documents_status[document_id] = "Uploaded"
+        document_path = os.path.join("cache/documents/", filename)
+
+        background_tasks.add_task(
+            document_processor.process_document,
+            document_id,
+            document_path,
+            config,  # Pass updated settings
+        )
+
+        documents_status[document_id] = "Processing"
+        processed_files.append(filename)
+
+    return {"message": "Processing started", "processed_files": processed_files}
 
 
-@router.post("/status/")
-def get_status():
-    """API endpoint to check document processing status."""
-    return documents_status
+@router.websocket("/ws/status/")
+async def websocket_status_endpoint(websocket: WebSocket):
+    """WebSocket to send real-time document processing updates."""
+    await websocket.accept()
+    active_connections.add(websocket)
+
+    try:
+        while True:
+            # Fetch latest document statuses
+            document_statuses = await fetch_document_statuses()
+            status_update = json.dumps({"documents": document_statuses})
+
+            # Send update to all connected clients
+            for connection in active_connections:
+                await connection.send_text(status_update)
+
+            await asyncio.sleep(2)  # Send updates every 2 seconds
+
+    except WebSocketDisconnect:
+        active_connections.remove(websocket)

@@ -105,8 +105,12 @@ def update_settings(settings: Settings):
     for key, value in settings_dict.items():
         if hasattr(settings_cache, key):
             setattr(settings_cache, key, value)
-    print(settings_cache)
+
     save_cache_to_file()
+
+    # Reinitialize clients with the new settings
+    # setup_clients(settings_cache)
+
     return {"message": "Settings updated successfully."}
 
 

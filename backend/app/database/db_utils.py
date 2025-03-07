@@ -7,10 +7,28 @@ from config.project_config import SQLITE_DB_PATH, CACHE_EXPIRY_DAYS
 
 def execute_query(query: str, params: tuple = ()) -> list[Any]:
     """Execute an SQL query and return results."""
-    with sqlite3.connect(SQLITE_DB_PATH) as conn:
-        cursor = conn.cursor()
-        cursor.execute(query, params)
-        return cursor.fetchall()
+    try:
+        with sqlite3.connect(SQLITE_DB_PATH) as conn:
+            cursor = conn.cursor()
+            cursor.execute(query, params)
+            return cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+        return []
+
+
+async def fetch_document_statuses():
+    """Fetch current document statuses from the database."""
+    query = "SELECT filename, stage FROM documents ORDER BY timestamp DESC"
+    results = execute_query(query)
+    return results
+
+
+def get_filenames_processing():
+    """Fetches all filenames for records with stage 'uploaded'."""
+    query = "SELECT filename FROM documents WHERE stage = 'extraction'"
+    results = execute_query(query)
+    return results
 
 
 def update_document_stage(

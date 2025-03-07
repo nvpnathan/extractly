@@ -1,4 +1,5 @@
 const API_BASE_URL = "http://127.0.0.1:8000/api/process-docs";
+const API_PROCESS_BASE_URL = "http://127.0.0.1:8000/api/document-processor";
 
 document.addEventListener("DOMContentLoaded", () => {
     console.log("Process Documents page loaded");
@@ -103,43 +104,83 @@ function uploadDocuments() {
 
 function processDocuments() {
     const processButton = document.getElementById("process-docs-btn");
-    const fileRows = document.querySelectorAll("#document-list tr");
 
-    if (fileRows.length === 0) {
-        alert("No documents to process.");
-        return;
-    }
-
-    const filesToProcess = Array.from(fileRows).map(row => row.cells[0].innerText);
-
-    fetch(`${API_BASE_URL}/process`, {
+    fetch(`${API_PROCESS_BASE_URL}/process`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ files: filesToProcess })
+        }
     })
     .then(response => response.json())
     .then(data => {
-        data.processed_files.forEach(file => {
-            const row = Array.from(fileRows).find(row => row.cells[0].innerText === file);
-            if (row) {
-                const badge = row.querySelector(".badge");
-                badge.classList.remove("bg-success");
-                badge.classList.add("bg-primary");
-                badge.innerText = "Processed";
-            }
-        });
+        if (data.message === "Processing started") {
+            alert("Document processing has started.");
+        } else {
+            alert("Error: " + (data.error || "Unknown error"));
+        }
 
-        // Disable button after processing
+        // Disable button after processing to prevent multiple clicks
         processButton.disabled = true;
     })
     .catch(error => {
         console.error("Error processing documents:", error);
+        alert("An error occurred while processing documents.");
     });
 }
 
 function viewDocument(filename) {
     alert(`Viewing document: ${filename}`);
     // Implement actual document viewer logic here
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const socket = new WebSocket("ws://localhost:8000/api/document-processor/ws/status/");
+
+    socket.onmessage = function (event) {
+        const data = JSON.parse(event.data);
+        updateDocumentTable(data.documents);
+    };
+
+    socket.onclose = function () {
+        console.warn("WebSocket connection closed. Reconnecting...");
+        setTimeout(() => location.reload(), 5000);
+    };
+});
+
+function updateDocumentTable(documents) {
+    const documentList = document.getElementById("document-list");
+    documentList.innerHTML = "";  // Clear table before updating
+
+    documents.forEach(doc => {
+        const row = document.createElement("tr");
+
+        // Filename Column
+        const filenameCell = document.createElement("td");
+        filenameCell.textContent = doc[0];
+
+        // Status Column
+        const statusCell = document.createElement("td");
+        statusCell.textContent = doc[1]; // e.g., "Uploaded", "Processing", "Completed"
+        statusCell.className = getStatusBadgeClass(doc[1]);
+
+        // Append to row
+        row.appendChild(filenameCell);
+        row.appendChild(statusCell);
+        documentList.appendChild(row);
+    });
+}
+
+function getStatusBadgeClass(status) {
+    switch (status) {
+        case "digitization":
+            return "badge bg-secondary";
+        case "classification":
+            return "badge bg-warning";
+        case "extraction":
+            return "badge bg-success text-light";
+        case "error":
+            return "badge bg-error";
+        default:
+            return "badge bg-info text-light"; // Ensures readable text
+    }
 }

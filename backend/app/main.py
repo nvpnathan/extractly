@@ -10,7 +10,6 @@ from services.document_processor import router as document_processor_router
 from models.classification_model import Classification
 from models.extraction_model import Extraction, DocumentStats, FieldStats, FieldData
 
-# initialize_environment()
 
 app = FastAPI()
 
