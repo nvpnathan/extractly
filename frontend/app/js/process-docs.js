@@ -1,5 +1,5 @@
 const API_BASE_URL = "http://127.0.0.1:8000/api/process-docs";
-const API_PROCESS_BASE_URL = "http://127.0.0.1:8000/api/document-processor";
+const API_WS_BASE_URL = "ws://localhost:8000/api/process-docs";
 
 document.addEventListener("DOMContentLoaded", () => {
     console.log("Process Documents page loaded");
@@ -105,7 +105,7 @@ function uploadDocuments() {
 function processDocuments() {
     const processButton = document.getElementById("process-docs-btn");
 
-    fetch(`${API_PROCESS_BASE_URL}/process`, {
+    fetch(`${API_BASE_URL}/process`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -134,7 +134,7 @@ function viewDocument(filename) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    const socket = new WebSocket("ws://localhost:8000/api/document-processor/ws/status/");
+    const socket = new WebSocket(`${API_WS_BASE_URL}/ws/status/`);
 
     socket.onmessage = function (event) {
         const data = JSON.parse(event.data);
