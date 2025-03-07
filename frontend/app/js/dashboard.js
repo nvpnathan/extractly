@@ -1,5 +1,9 @@
-const API_BASE_URL = "http://127.0.0.1:8000";
-const DOCUMENT_FILE_PATH = "/Users/nathanness/repos/DU-Cloud-APIs/Paystub-600-evalset/";
+require('dotenv').config();
+const API_BASE_URL = process.env.API_BASE_URL;
+const DOCUMENT_FILE_PATH = process.env.DOCUMENT_FILE_PATH;
+
+console.log("API_BASE_URL:", API_BASE_URL);
+console.log("DOCUMENT_FILE_PATH:", DOCUMENT_FILE_PATH);
 
 // Fetch and render stats
 async function loadStats() {

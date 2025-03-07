@@ -38,14 +38,14 @@
             <div class="card-body">
                 <h3 class="card-title">Upload Documents</h3>
                 <input type="file" id="document-upload" class="form-control" multiple>
-                <button class="btn btn-primary mt-3" onclick="processDocuments()">Upload</button>
+                <button class="btn btn-primary mt-3" onclick="uploadDocuments()">Upload</button>
             </div>
         </div>
 
         <!-- Document Processing Table -->
         <div class="card mt-4">
             <div class="card-body">
-                <h3 class="card-title">Processed Documents</h3>
+                <h3 class="card-title">Documents</h3>
                 <table class="table">
                     <thead>
                         <tr>
@@ -58,9 +58,12 @@
                         <!-- Dynamically populated -->
                     </tbody>
                 </table>
+                <!-- Process Documents Button -->
+                <button id="process-docs-btn" class="btn btn-success mt-3" onclick="processDocuments()" disabled>
+                    Process Documents
+                </button>
             </div>
         </div>
-    </div>
 
     <!-- Tabler JS -->
     <script src="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/js/tabler.min.js"></script>

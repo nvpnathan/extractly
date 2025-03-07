@@ -170,7 +170,7 @@ def process_documents(background_tasks: BackgroundTasks):
     return {"message": "Processing started"}
 
 
-@router.get("/status/")
+@router.post("/status/")
 def get_status():
     """API endpoint to check document processing status."""
     return documents_status
