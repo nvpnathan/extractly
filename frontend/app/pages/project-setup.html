@@ -94,61 +94,65 @@
             </div>
         </div>
 
-        <!-- Classifier Selection -->
-        <div class="card mt-3">
-            <div class="card-body">
-                <h3 class="card-title">Select Classifier</h3>
+        <!-- Classifier Section -->
+        <div id="classifier-section" style="display: none;">
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h3 class="card-title">Select Classifier</h3>
 
-                <!-- Search Input -->
-                <input type="text" id="classifier-search" class="form-control mb-3" placeholder="Search classifiers..." onkeyup="filterClassifiers()">
+                    <!-- Search Input -->
+                    <input type="text" id="classifier-search" class="form-control mb-3" placeholder="Search classifiers..." onkeyup="filterClassifiers()">
 
-                <!-- Scrollable Table -->
-                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Type</th>
-                                <th>Status</th>
-                                <th>Select</th>
-                            </tr>
-                        </thead>
-                        <tbody id="classifier-table-body">
-                            <!-- Populated dynamically -->
-                        </tbody>
-                    </table>
+                    <!-- Scrollable Table -->
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Select</th>
+                                </tr>
+                            </thead>
+                            <tbody id="classifier-table-body">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Extractor Selection -->
-        <div class="card mt-3">
-            <div class="card-body">
-                <h3 class="card-title">Select Extractor</h3>
+        <div id="extractor-section" style="display: none;">
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h3 class="card-title">Select Extractor</h3>
 
-                <!-- Search Input -->
-                <input type="text" id="extractor-search" class="form-control mb-3" placeholder="Search extractors..." onkeyup="filterExtractors()">
+                    <!-- Search Input -->
+                    <input type="text" id="extractor-search" class="form-control mb-3" placeholder="Search extractors..." onkeyup="filterExtractors()">
 
-                <!-- Scrollable Table -->
-                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Type</th>
-                                <th>Status</th>
-                                <th>Select</th>
-                            </tr>
-                        </thead>
-                        <tbody id="extractor-table-body">
-                            <!-- Populated dynamically -->
-                        </tbody>
-                    </table>
-                </div>
+                    <!-- Scrollable Table -->
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Select</th>
+                                </tr>
+                            </thead>
+                            <tbody id="extractor-table-body">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
 
-                <!-- Extractor List -->
-                <div id="extractor-list" class="mt-3">
-                    <!-- Populated dynamically -->
+                    <!-- Extractor List -->
+                    <div id="extractor-list" class="mt-3">
+                        <!-- Populated dynamically -->
+                    </div>
                 </div>
             </div>
         </div>

@@ -11,7 +11,6 @@ from fastapi import (
     WebSocket,
     WebSocketDisconnect,
 )
-from config.project_config import BASE_URL
 from api.auth import initialize_authentication
 from database.db_utils import (
     update_cache,
@@ -29,8 +28,6 @@ def get_bearer_token():
     """Returns the latest valid bearer token."""
     return auth.get_bearer_token()
 
-
-base_url = BASE_URL
 
 router = APIRouter()
 
