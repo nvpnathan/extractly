@@ -26,7 +26,7 @@ async def fetch_document_statuses():
 
 def get_filenames_processing():
     """Fetches all filenames for records with stage 'uploaded'."""
-    query = "SELECT filename FROM documents WHERE stage = 'extraction'"
+    query = "SELECT filename FROM documents WHERE stage = 'uploaded'"
     results = execute_query(query)
     return results
 
