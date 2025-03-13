@@ -7,11 +7,11 @@ class ClassifierSettings(BaseModel):
     name: str
     resourceType: str
     status: str
-    documentTypeIds: List
+    documentTypeIds: List[str]
     detailsUrl: str
     syncUrl: str
     asyncUrl: str
-    properties: List
+    properties: List[dict]
 
 
 class ProjectSettings(BaseModel):
@@ -22,9 +22,10 @@ class ProjectSettings(BaseModel):
 
 
 class Settings(BaseModel):
-    validate_classification: bool
-    validate_extraction: bool
-    validate_extraction_later: bool
-    perform_classification: bool
-    perform_extraction: bool
-    project: ProjectSettings
+    # Make all fields optional with defaults to match original dataclass behavior
+    validate_classification: bool = False
+    validate_extraction: bool = False
+    validate_extraction_later: bool = False
+    perform_classification: bool = False
+    perform_extraction: bool = False
+    project: ProjectSettings = ProjectSettings()

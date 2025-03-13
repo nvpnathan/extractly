@@ -3,7 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.discovery_routes import router as discovery_router
 from api.process_docs import router as process_docs_router
 from api.results_dashboard import router as dashboard_router
+from config.project_setup import ensure_database
 
+# Initialize the database
+ensure_database()
 
 app = FastAPI()
 

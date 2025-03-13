@@ -1,24 +1,18 @@
-import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-from dotenv import load_dotenv
+from config.project_config import SQLITE_DB_PATH
 
-load_dotenv()
+# Ensure SQLITE_DB_PATH includes sqlite:/// if using a file
+if not SQLITE_DB_PATH.startswith("sqlite:///"):
+    SQLITE_DB_PATH = f"sqlite:///{SQLITE_DB_PATH}"
 
-# SQLite database URL
-DATABASE_URL = os.environ.get("DATABASE_URL")
+engine = create_engine(SQLITE_DB_PATH, connect_args={"check_same_thread": False})
 
-# Create the database engine
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-
-# Create a session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Base class for ORM models
 Base = declarative_base()
 
 
-# Dependency to get DB session
 def get_db():
     db = SessionLocal()
     try:

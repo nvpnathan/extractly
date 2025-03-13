@@ -6,8 +6,9 @@ from services.digitize import Digitize
 from services.classify import Classify
 from services.extract import Extract
 from services.validate import Validate
-from api.discovery_routes import get_settings_instance
+from api.discovery_routes import SettingsManager
 from api.auth import initialize_authentication
+from models.settings_model import Settings
 from config.project_config import BASE_URL, CACHE_DIR, SQLITE_DB_PATH
 
 
@@ -107,17 +108,6 @@ def ensure_database():
         conn.close()
 
 
-# Function to initialize clients
-def initialize_clients(base_url: str, bearer_token: str):
-    config = get_settings_instance()
-    digitize_client = Digitize(base_url, config.project.id, bearer_token)
-    classify_client = Classify(base_url, config.project.id, bearer_token)
-    extract_client = Extract(base_url, config.project.id, bearer_token)
-    validate_client = Validate(base_url, config.project.id, bearer_token)
-
-    return digitize_client, classify_client, extract_client, validate_client
-
-
 def load_prompts(document_type_id: str) -> dict | None:
     """Load prompts from a JSON file based on the document type ID."""
     prompts_directory = "generative_prompts"
@@ -130,13 +120,21 @@ def load_prompts(document_type_id: str) -> dict | None:
         return None
 
 
+# Function to initialize clients
+def initialize_clients(base_url: str, bearer_token: str):
+    config: Settings = SettingsManager.get_settings()
+    digitize_client = Digitize(base_url, config.project.id, bearer_token)
+    classify_client = Classify(base_url, config.project.id, bearer_token)
+    extract_client = Extract(base_url, config.project.id, bearer_token)
+    validate_client = Validate(base_url, config.project.id, bearer_token)
+
+    return digitize_client, classify_client, extract_client, validate_client
+
+
 def initialize_environment():
     """Initialize the processing environment and return initialized clients."""
     # Load environment variables
     load_dotenv()
-
-    # Ensure database exists
-    ensure_database()
 
     # Initialize clients with authentication
     bearer_token = get_bearer_token()

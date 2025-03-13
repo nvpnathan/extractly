@@ -1,11 +1,10 @@
 import os
 import json
 import requests
-from fastapi import APIRouter, HTTPException
-from models.settings_model import Settings, ProjectSettings
-from dataclasses import dataclass, asdict, field
-from config.project_config import CACHE_DIR, CACHE_FILE
-from config.project_config import BASE_URL
+from fastapi import APIRouter, HTTPException, Depends
+from typing import Optional
+from models.settings_model import Settings
+from config.project_config import CACHE_DIR, CACHE_FILE, BASE_URL
 from api.auth import initialize_authentication
 
 # Initialize authentication
@@ -22,96 +21,84 @@ base_url = BASE_URL
 router = APIRouter()
 
 
-@dataclass
-class ProcessingConfig:
-    """Data class to store application settings."""
-
-    validate_classification: bool = False
-    validate_extraction: bool = False
-    validate_extraction_later: bool = False
-    perform_classification: bool = False
-    perform_extraction: bool = False
-    project: ProjectSettings = field(default_factory=ProjectSettings)
-
-
-# Global settings instance
-settings_cache = ProcessingConfig()
-
-
-# Export the settings dataclass to make it accessible to other modules
-def get_settings_instance() -> ProcessingConfig:
-    """Return the current settings instance for use in other modules."""
-    return settings_cache
-
-
 def ensure_cache_directory():
     """Ensure the cache directory exists."""
     if not os.path.exists(CACHE_DIR):
         os.makedirs(CACHE_DIR)
 
 
-def save_cache_to_file():
-    """Save the current settings to a JSON file."""
-    ensure_cache_directory()
-    with open(CACHE_FILE, "w", encoding="utf-8") as cache_file:
-        json.dump(asdict(settings_cache), cache_file, indent=4)
+class SettingsManager:
+    """Manages the Settings instance across the application."""
+
+    _instance: Optional[Settings] = None
+
+    @classmethod
+    def get_settings(cls) -> Settings:
+        """Get the settings instance, trying to load from cache file first."""
+        # If we haven't loaded settings yet, try the cache file
+        if cls._instance is None:
+            if os.path.exists(CACHE_FILE):
+                try:
+                    with open(CACHE_FILE, "r", encoding="utf-8") as f:
+                        json_str = f.read()
+                        cls._instance = Settings.model_validate_json(json_str)
+                except (json.JSONDecodeError, ValueError) as e:
+                    print(f"Error loading cache: {e}. Using default settings.")
+                    cls._instance = Settings()
+            else:
+                cls._instance = Settings()
+        return cls._instance
+
+    @classmethod
+    def update_settings(cls, new_config: Settings) -> None:
+        """Update the settings with new values."""
+        cls._instance = new_config
+
+    @classmethod
+    def save_to_file(cls, filename: str = CACHE_FILE):
+        """Save the current settings to a JSON file."""
+        os.makedirs(CACHE_DIR, exist_ok=True)  # Ensure cache directory exists
+        with open(filename, "w", encoding="utf-8") as f:
+            f.write(cls._instance.model_dump_json(indent=4))
+
+    @classmethod
+    def load_cache_from_file(cls, filename: str = CACHE_FILE):
+        """Load settings from a JSON file if it exists (for explicit loading)."""
+        if os.path.exists(filename):
+            try:
+                with open(filename, "r", encoding="utf-8") as f:
+                    json_str = f.read()
+                    cls._instance = Settings.model_validate_json(json_str)
+            except (json.JSONDecodeError, ValueError) as e:
+                print(f"Error loading cache: {e}. Using default settings.")
+                cls._instance = Settings()
+        else:
+            cls._instance = Settings()
 
 
-def load_cache_from_file():
-    """Load settings from a JSON file if it exists."""
-    global settings_cache
-
-    if os.path.exists(CACHE_FILE):
-        with open(CACHE_FILE, "r", encoding="utf-8") as cache_file:
-            data = json.load(cache_file)
-
-            # Ensure 'project' is correctly parsed as a ProjectSettings instance
-            project_data = data.get("project", {})
-            project_settings = (
-                ProjectSettings(**project_data)
-                if project_data
-                else ProjectSettings(id="", name="")
-            )
-
-            # Create a ProcessingConfig instance with the loaded values
-            settings_cache = ProcessingConfig(
-                validate_classification=data.get("validate_classification", False),
-                validate_extraction=data.get("validate_extraction", False),
-                validate_extraction_later=data.get("validate_extraction_later", False),
-                perform_classification=data.get("perform_classification", False),
-                perform_extraction=data.get("perform_extraction", False),
-                project=project_settings,
-            )
-    else:
-        settings_cache = ProcessingConfig()
-
-
-# Load settings on module initialization
-load_cache_from_file()
+# Dependency for FastAPI
+def get_config() -> Settings:
+    """Dependency injection function for FastAPI routes."""
+    return SettingsManager.get_settings()
 
 
 @router.get("/settings")
-def get_settings():
-    """Retrieve stored settings from the dataclass."""
-    return settings_cache
+async def get_current_config(config: Settings = Depends(get_config)):
+    """Get the current configuration."""
+    return config
 
 
 @router.post("/settings")
-def update_settings(settings: Settings):
-    """Update user settings in the dataclass and save to cache file."""
-    global settings_cache  # Ensure we modify the global instance
-
-    settings_dict = settings.model_dump()
-    for key, value in settings_dict.items():
-        if hasattr(settings_cache, key):
-            setattr(settings_cache, key, value)
-
-    save_cache_to_file()
-
-    # Reinitialize clients with the new settings
-    # setup_clients(settings_cache)
-
-    return {"message": "Settings updated successfully."}
+async def update_config(
+    config: Settings, current_config: Settings = Depends(get_config)
+):
+    """Update the application configuration."""
+    try:
+        SettingsManager.update_settings(config)
+        SettingsManager.save_to_file()
+        return {"message": "Configuration updated successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.get("/projects")
@@ -141,7 +128,7 @@ def get_projects():
 @router.get("/project/{project_id}/classifiers")
 def get_classifiers(project_id: str):
     """Retrieve classifiers from API."""
-    api_url = f"{base_url}/{project_id}/classifiers?api-version=1.1"
+    api_url = f"{base_url}{project_id}/classifiers?api-version=1.1"
     headers = {
         "Authorization": f"Bearer {get_bearer_token()}",
         "accept": "application/json",
@@ -165,7 +152,7 @@ def get_classifiers(project_id: str):
 @router.get("/project/{project_id}/extractors")
 def get_extractors(project_id: str):
     """Retrieve extractors from API."""
-    api_url = f"{base_url}/{project_id}/extractors?api-version=1.1"
+    api_url = f"{base_url}{project_id}/extractors?api-version=1.1"
     headers = {
         "Authorization": f"Bearer {get_bearer_token()}",
         "accept": "application/json",

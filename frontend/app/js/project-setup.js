@@ -29,10 +29,6 @@ function fetchSettings() {
         settings = data; // Store settings globally
         updateSliders();
 
-        // Ensure the UI reflects the current settings
-        toggleClassifierSection(settings.perform_classification);
-        toggleExtractorSection(settings.perform_extraction);
-
         // If we have a selected project, update the UI to reflect it
         if (settings.project && settings.project.id) {
             updateSelectedProjectUI(settings.project.id);
@@ -87,39 +83,17 @@ function updateSliders() {
 function toggleSetting(settingKey) {
     settings[settingKey] = !settings[settingKey]; // Toggle boolean value
 
-    // If toggling classification, show/hide classifier section
-    if (settingKey === 'perform_classification') {
-        toggleClassifierSection(settings.perform_classification);
-
-        if (settings.perform_classification && settings.project && settings.project.id) {
+    // If toggling classification or extraction, update UI accordingly
+    if (settingKey === 'perform_classification' && settings.project && settings.project.id) {
+        if (settings.perform_classification) {
             fetchClassifiers(settings.project.id);
         }
     }
 
     if (settingKey === 'perform_extraction' && settings.project && settings.project.id) {
-        toggleExtractorSection(settings.perform_extraction);
-
         if (settings.perform_extraction) {
             fetchExtractors(settings.project.id);
         }
-    }
-}
-
-function toggleClassifierSection(show) {
-    const classifierSection = document.getElementById("classifier-section");
-    if (show) {
-        classifierSection.style.display = "block";  // Show classifier section
-    } else {
-        classifierSection.style.display = "none";   // Hide classifier section
-    }
-}
-
-function toggleExtractorSection(show) {
-    const extractorSection = document.getElementById("extractor-section");
-    if (show) {
-        extractorSection.style.display = "block";  // Show extractor section
-    } else {
-        extractorSection.style.display = "none";   // Hide extractor section
     }
 }
 
