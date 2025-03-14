@@ -26,3 +26,6 @@ output_results/
 
 # Node
 node_modules/
+
+# VS Code
+.vscode/

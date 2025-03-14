@@ -29,6 +29,10 @@ function fetchSettings() {
         settings = data; // Store settings globally
         updateSliders();
 
+        // Ensure classifier and extractor sections are shown/hidden based on settings
+        toggleClassifierSection(settings.perform_classification);
+        toggleExtractorSection(settings.perform_extraction);
+
         // If we have a selected project, update the UI to reflect it
         if (settings.project && settings.project.id) {
             updateSelectedProjectUI(settings.project.id);
@@ -83,17 +87,39 @@ function updateSliders() {
 function toggleSetting(settingKey) {
     settings[settingKey] = !settings[settingKey]; // Toggle boolean value
 
-    // If toggling classification or extraction, update UI accordingly
-    if (settingKey === 'perform_classification' && settings.project && settings.project.id) {
-        if (settings.perform_classification) {
+    // If toggling classification, show/hide classifier section
+    if (settingKey === 'perform_classification') {
+        toggleClassifierSection(settings.perform_classification);
+
+        if (settings.perform_classification && settings.project && settings.project.id) {
             fetchClassifiers(settings.project.id);
         }
     }
 
-    if (settingKey === 'perform_extraction' && settings.project && settings.project.id) {
-        if (settings.perform_extraction) {
+    if (settingKey === 'perform_extraction') {
+        toggleExtractorSection(settings.perform_extraction);
+
+        if (settings.perform_extraction && settings.project && settings.project.id) {
             fetchExtractors(settings.project.id);
         }
+    }
+}
+
+function toggleClassifierSection(show) {
+    const classifierSection = document.getElementById("classifier-section");
+    if (show) {
+        classifierSection.style.display = "block";  // Show classifier section
+    } else {
+        classifierSection.style.display = "none";   // Hide classifier section
+    }
+}
+
+function toggleExtractorSection(show) {
+    const extractorSection = document.getElementById("extractor-section");
+    if (show) {
+        extractorSection.style.display = "block";  // Show extractor section
+    } else {
+        extractorSection.style.display = "none";   // Hide extractor section
     }
 }
 
@@ -439,24 +465,6 @@ function fetchExtractors(projectId) {
             });
         })
         .catch(error => console.error("Error fetching extractors:", error));
-}
-
-function selectClassifier(classifierId) {
-    // Find the classifier details
-    const selectedClassifier = availableClassifiers.find(c => c.id === classifierId);
-
-    if (!selectedClassifier) {
-        console.error("Classifier not found:", classifierId);
-        return;
-    }
-
-    // Update settings with selected classifier
-    if (!settings.project) settings.project = {};
-    settings.project.classifier_id = {
-        id: selectedClassifier.id,
-        name: selectedClassifier.name,
-        doc_type_ids: selectedClassifier.doc_type_ids || []
-    };
 }
 
 // Function to show status messages

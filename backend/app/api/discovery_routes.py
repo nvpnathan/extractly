@@ -149,6 +149,33 @@ def get_classifiers(project_id: str):
         )
 
 
+@router.get("/project/{project_id}/classifiers/{classifier_id}")
+def get_classifier_id(project_id: str, classifier_id: str):
+    """Retrieve classifiers from API."""
+    api_url = f"{base_url}{project_id}/classifiers/{classifier_id}?api-version=1.1"
+    headers = {
+        "Authorization": f"Bearer {get_bearer_token()}",
+        "accept": "application/json",
+    }
+
+    try:
+        response = requests.get(api_url, headers=headers, timeout=300)
+        response.raise_for_status()
+        data = response.json()
+
+        if not data.get("documentTypes"):
+            raise HTTPException(status_code=404, detail="No classifier data found.")
+
+        names = [doc_types["name"] for doc_types in data["documentTypes"]]
+        # properties = data['properties']
+
+        return names
+    except requests.RequestException as e:
+        raise HTTPException(
+            status_code=500, detail=f"Error fetching classifier: {str(e)}"
+        )
+
+
 @router.get("/project/{project_id}/extractors")
 def get_extractors(project_id: str):
     """Retrieve extractors from API."""
