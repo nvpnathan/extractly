@@ -11,26 +11,54 @@
             position: relative;
             width: 100%;
             height: 80vh;
-            border: none; /* Remove border to avoid offset */
+            border: none;
             overflow: auto;
-            padding: 0; /* Remove any padding */
-            margin: 0; /* Remove any margin */
+            padding: 0;
+            margin: 0;
         }
         #pdf-canvas {
-            display: block; /* Ensure no extra spacing */
-            margin: 0; /* Remove any margin */
-            padding: 0; /* Remove any padding */
-            /* Remove width and height styling to avoid resizing */
+            display: block;
+            margin: 0;
+            padding: 0;
         }
         .highlight {
             position: absolute;
             background: rgba(255, 255, 0, 0.5);
-            box-sizing: border-box; /* Include border in dimensions */
+            box-sizing: border-box;
             pointer-events: none;
         }
         .row, .col-md-8, .col-md-4 {
-            padding: 0; /* Remove Bootstrap padding */
-            margin: 0; /* Remove Bootstrap margin */
+            padding: 0;
+            margin: 0;
+        }
+        #line-items-container {
+            margin-top: 20px;
+            width: 100%;
+            text-align: left;
+        }
+        #line-items-table {
+            max-height: 300px;
+            overflow-y: auto;
+            width: 100%;
+        }
+        #line-items-table table {
+            margin: 0;
+        }
+        .editable-field {
+            cursor: pointer;
+            display: inline-block;
+            width: 100%;
+        }
+        .editable-field:hover {
+            background-color: #f8f9fa;
+        }
+        .editable-input {
+            width: 100%;
+            padding: 2px 5px;
+            font-size: 0.875rem;
+        }
+        .list-group-item {
+            padding: 0.5rem 1rem;
         }
     </style>
 </head>
@@ -46,7 +74,16 @@
             <div class="col-md-4">
                 <h4>Extracted Fields</h4>
                 <ul id="extracted-fields" class="list-group"></ul>
-                <button class="btn btn-success mt-3" onclick="submitValidation()">Submit Validation</button>
+                <button class="btn btn-primary mt-2" onclick="saveChanges()">Submit Validation</button>
+            </div>
+        </div>
+        <div id="line-items-container">
+            <h4>Line Items</h4>
+            <div id="line-items-table">
+                <table class="table table-bordered table-sm">
+                    <thead id="line-items-thead"></thead>
+                    <tbody id="line-items-tbody"></tbody>
+                </table>
             </div>
         </div>
     </div>
