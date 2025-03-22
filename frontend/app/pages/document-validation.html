@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HITL Document Validator</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/css/tabler.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <style>
+        #viewer-container {
+            position: relative;
+            width: 100%;
+            height: 80vh;
+            border: none; /* Remove border to avoid offset */
+            overflow: auto;
+            padding: 0; /* Remove any padding */
+            margin: 0; /* Remove any margin */
+        }
+        #pdf-canvas {
+            display: block; /* Ensure no extra spacing */
+            margin: 0; /* Remove any margin */
+            padding: 0; /* Remove any padding */
+            /* Remove width and height styling to avoid resizing */
+        }
+        .highlight {
+            position: absolute;
+            background: rgba(255, 255, 0, 0.5);
+            box-sizing: border-box; /* Include border in dimensions */
+            pointer-events: none;
+        }
+        .row, .col-md-8, .col-md-4 {
+            padding: 0; /* Remove Bootstrap padding */
+            margin: 0; /* Remove Bootstrap margin */
+        }
+    </style>
+</head>
+<body>
+    <div class="container my-3">
+        <h2>HITL Document Validation</h2>
+        <div class="row">
+            <div class="col-md-8">
+                <div id="viewer-container">
+                    <canvas id="pdf-canvas"></canvas>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <h4>Extracted Fields</h4>
+                <ul id="extracted-fields" class="list-group"></ul>
+                <button class="btn btn-success mt-3" onclick="submitValidation()">Submit Validation</button>
+            </div>
+        </div>
+    </div>
+    <script src="../js/document-validation.js"></script>
+</body>
+</html>
