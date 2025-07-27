@@ -7,7 +7,6 @@ from fastapi import (
     APIRouter,
     UploadFile,
     File,
-    BackgroundTasks,
     WebSocket,
     WebSocketDisconnect,
 )
@@ -64,11 +63,9 @@ async def get_files():
 
 
 @router.post("/process/")
-def process_documents(background_tasks: BackgroundTasks):
-    """API endpoint to process uploaded documents."""
-    processor = (
-        get_document_processor()
-    )  # This ensures settings and processor are initialized
+def process_documents():
+    """API endpoint to process uploaded documents concurrently."""
+    processor = get_document_processor()
     config: Settings = SettingsManager.get_settings()
     filenames = get_filenames_processing()
 
@@ -81,13 +78,13 @@ def process_documents(background_tasks: BackgroundTasks):
         document_id = filename.rsplit(".", 1)[0]
         document_path = os.path.join(f"{CACHE_DIR}/documents/", filename)
 
-        background_tasks.add_task(
+        # Submit each task to the ThreadPoolExecutor
+        processor.executor.submit(
             processor.process_document,
             document_id,
             document_path,
             config,
         )
-
         processed_files.append(filename)
 
     return {"message": "Processing started", "processed_files": processed_files}

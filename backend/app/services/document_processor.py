@@ -17,7 +17,7 @@ class DocumentProcessor:
         self.classify_client = classify_client
         self.extract_client = extract_client
         self.validate_client = validate_client
-        self.executor = ThreadPoolExecutor()
+        self.executor = ThreadPoolExecutor(max_workers=20)
         self.documents_status = {}
 
     def process_document(self, document_id: str, document_path: str, config: Settings):
