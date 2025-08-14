@@ -467,6 +467,31 @@ function fetchExtractors(projectId) {
         .catch(error => console.error("Error fetching extractors:", error));
 }
 
+// Helper function to handle UI updates after extractor selection
+function filterExtractors() {
+    const searchText = document.getElementById("extractor-search").value.toLowerCase();
+    const tableRows = document.getElementById("extractor-table-body").getElementsByTagName("tr");
+
+    for (let i = 0; i < tableRows.length; i++) {
+        const row = tableRows[i];
+
+        // Combine values from all searchable columns: name, resourceType, and status
+        const name = row.cells[0]?.textContent?.toLowerCase() || "";
+        const type = row.cells[1]?.textContent?.toLowerCase() || "";
+        const status = row.cells[2]?.textContent?.toLowerCase() || "";
+
+        if (
+            name.includes(searchText) ||
+            type.includes(searchText) ||
+            status.includes(searchText)
+        ) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    }
+}
+
 // Function to show status messages
 function showStatusMessage(message, type = 'success') {
     const statusDiv = document.getElementById('status-message');
