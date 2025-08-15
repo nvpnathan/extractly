@@ -104,7 +104,7 @@ async def update_config(
 @router.get("/projects")
 def get_projects():
     """Retrieve projects from API."""
-    api_url = f"{base_url}?api-version=1.1"
+    api_url = f"{base_url}/du_/api/framework/projects/?api-version=1.1"
     headers = {
         "Authorization": f"Bearer {get_bearer_token()}",
         "accept": "application/json",
@@ -128,7 +128,7 @@ def get_projects():
 @router.get("/project/{project_id}/classifiers")
 def get_classifiers(project_id: str):
     """Retrieve classifiers from API."""
-    api_url = f"{base_url}{project_id}/classifiers?api-version=1.1"
+    api_url = f"{base_url}/du_/api/framework/projects/{project_id}/classifiers?api-version=1.1"
     headers = {
         "Authorization": f"Bearer {get_bearer_token()}",
         "accept": "application/json",
@@ -152,7 +152,7 @@ def get_classifiers(project_id: str):
 @router.get("/project/{project_id}/classifiers/{classifier_id}")
 def get_classifier_id(project_id: str, classifier_id: str):
     """Retrieve classifiers from API."""
-    api_url = f"{base_url}{project_id}/classifiers/{classifier_id}?api-version=1.1"
+    api_url = f"{base_url}/du_/api/framework/projects/{project_id}/classifiers/{classifier_id}?api-version=1.1"
     headers = {
         "Authorization": f"Bearer {get_bearer_token()}",
         "accept": "application/json",
@@ -179,7 +179,9 @@ def get_classifier_id(project_id: str, classifier_id: str):
 @router.get("/project/{project_id}/extractors")
 def get_extractors(project_id: str):
     """Retrieve extractors from API."""
-    api_url = f"{base_url}{project_id}/extractors?api-version=1.1"
+    api_url = (
+        f"{base_url}/du_/api/framework/projects/{project_id}/extractors?api-version=1.1"
+    )
     headers = {
         "Authorization": f"Bearer {get_bearer_token()}",
         "accept": "application/json",

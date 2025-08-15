@@ -55,7 +55,7 @@ class Digitize:
             project_id=self.project_id,
         )
 
-        api_url = f"{self.base_url}{self.project_id}/digitization/start?api-version=1"
+        api_url = f"{self.base_url}/du_/api/framework/projects/{self.project_id}/digitization/start?api-version=1"
         headers = {
             "Authorization": f"Bearer {self.bearer_token}",
             "accept": "text/plain",

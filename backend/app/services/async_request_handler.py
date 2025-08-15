@@ -32,14 +32,12 @@ def submit_async_request(
     extractor_id = None
 
     if action.startswith("digitization") and module_id:
-        api_url = (
-            f"{base_url}{project_id}/{module_id}/result/{operation_id}?api-version=1.1"
-        )
+        api_url = f"{base_url}/du_/api/framework/projects/{project_id}/{module_id}/result/{operation_id}?api-version=1.1"
     elif action.startswith("classification") and module_id:
-        api_url = f"{base_url}{project_id}/classifiers/{module_id}/classification/result/{operation_id}?api-version=1.1"
+        api_url = f"{base_url}/du_/api/framework/projects/{project_id}/classifiers/{module_id}/classification/result/{operation_id}?api-version=1.1"
         classifier_id = module_id
     elif action.startswith("extraction") and module_id:
-        api_url = f"{base_url}{project_id}/extractors/{module_id}/extraction/result/{operation_id}?api-version=1.1"
+        api_url = f"{base_url}/du_/api/framework/projects/{project_id}/extractors/{module_id}/extraction/result/{operation_id}?api-version=1.1"
         extractor_id = module_id
     else:
         print("Invalid action or missing Module ID for extraction.")
@@ -135,10 +133,10 @@ def submit_validation_request(
     extractor_id = None
 
     if action.startswith("classification"):
-        api_url = f"{base_url}{project_id}/classifiers/{module_id}/validation/result/{operation_id}?api-version=1.1"
+        api_url = f"{base_url}/du_/api/framework/projects/{project_id}/classifiers/{module_id}/validation/result/{operation_id}?api-version=1.1"
         classifier_id = module_id
     elif action.startswith("extraction") and module_id:
-        api_url = f"{base_url}{project_id}/extractors/{module_id}/validation/result/{operation_id}?api-version=1.1"
+        api_url = f"{base_url}/du_/api/framework/projects/{project_id}/extractors/{module_id}/validation/result/{operation_id}?api-version=1.1"
         extractor_id = module_id
     else:
         print("Invalid action or missing extractor ID for extraction.")

@@ -20,7 +20,7 @@ class Extract:
             new_stage="extraction_init",
         )
         # Define the API endpoint for document extraction
-        api_url = f"{self.base_url}{self.project_id}/extractors/{extractor_id}/extraction/start?api-version=1.1"
+        api_url = f"{self.base_url}/du_/api/framework/projects/{self.project_id}/extractors/{extractor_id}/extraction/start?api-version=1.1"
 
         # Define the headers with the Bearer token and content type
         headers = {
